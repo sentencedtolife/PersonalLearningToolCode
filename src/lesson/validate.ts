@@ -104,7 +104,8 @@ export function validateLesson(parsed: ParsedLesson, opts: ValidateOptions = {})
   }
 
   const lesson = c.errors.length === 0 && meta ? buildLesson(parsed) : null;
-  return { errors: c.errors, warnings: c.warnings, lesson };
+  const byLine = (a: Issue, b: Issue) => a.line - b.line;
+  return { errors: c.errors.sort(byLine), warnings: c.warnings.sort(byLine), lesson };
 }
 
 function validateMeta(meta: Record<string, unknown>, lines: Record<string, number>, c: Collector, opts: ValidateOptions): void {
@@ -438,9 +439,14 @@ function buildLesson(parsed: ParsedLesson): Lesson {
 }
 
 export function formatIssue(i: Issue): string {
-  return `line ${i.line}, ${i.field}: ${i.message}${i.fix ? ` Fix: ${i.fix.replace(/\n/g, ' ')}` : ''}`;
+  return `${issueWhere(i)}, ${i.field}: ${i.message}${i.fix ? ` Fix: ${i.fix.replace(/\n/g, ' ')}` : ''}`;
 }
 
 export function errorReport(errors: Issue[]): string {
   return ['Fix these errors in the lesson file and output the full corrected lesson:', ...errors.map(formatIssue)].join('\n');
+}
+
+/** "line 14", or "whole lesson" for issues that are not about one line. */
+export function issueWhere(i: Issue): string {
+  return i.line > 0 ? `line ${i.line}` : 'whole lesson';
 }

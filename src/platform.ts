@@ -6,7 +6,20 @@ export async function copyText(text: string): Promise<void> {
     const { writeText } = await import('@tauri-apps/plugin-clipboard-manager');
     await writeText(text);
   } else {
-    await navigator.clipboard.writeText(text);
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // Some embedded browsers deny the Clipboard API; the old copy command still works there.
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.append(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      ta.remove();
+      if (!ok) throw new Error('the browser blocked clipboard access');
+    }
   }
 }
 

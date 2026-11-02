@@ -92,6 +92,24 @@ export function lessonProgress(p: Progress, id: string): LessonProgress {
   return (p.lessons[id] ??= { status: 'new', attempts: [] });
 }
 
+/** After a lesson is replaced: keep progress for question ids that still exist, drop the rest. */
+export function pruneLessonQuestions(p: Progress, lessonId: string, keepIds: string[]): string[] {
+  const keep = new Set(keepIds);
+  const dropped: string[] = [];
+  const prefix = `${lessonId}#`;
+  for (const map of [p.questions, p.taskChecks] as Record<string, unknown>[]) {
+    for (const key of Object.keys(map)) {
+      if (key.startsWith(prefix) && !keep.has(key.slice(prefix.length))) {
+        delete map[key];
+        dropped.push(key);
+      }
+    }
+  }
+  const run = p.lessons[lessonId]?.run;
+  if (run) for (const qid of Object.keys(run.results)) if (!keep.has(qid)) delete run.results[qid];
+  return dropped;
+}
+
 const FILE = 'progress.json';
 const BACKUP_DIR = 'backups';
 const KEEP_BACKUPS = 14;

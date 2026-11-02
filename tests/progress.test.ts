@@ -4,7 +4,7 @@ import { buildContext, weakTags } from '../src/progress/context';
 import { boxAfterFirstPractice, boxAfterReview, interval, recordAnswer, reviewQueue } from '../src/progress/leitner';
 import { unitLevel } from '../src/progress/mastery';
 import { pickNext } from '../src/progress/next';
-import { addDays, daysBetween, emptyProgress, loadProgress, saveProgress, today, type Progress, type Result } from '../src/progress/progress';
+import { addDays, daysBetween, emptyProgress, loadProgress, pruneLessonQuestions, saveProgress, today, type Progress, type Result } from '../src/progress/progress';
 import { BrowserStore } from '../src/store/browser-store';
 import { parseCurriculum } from '../src/curriculum';
 import { readRepoFile } from './helpers';
@@ -256,5 +256,20 @@ describe('progress.json storage', () => {
   it('no file = empty progress, no notice', async () => {
     const r = await loadProgress(new BrowserStore(new MemoryStorage()));
     expect(r).toEqual({ progress: emptyProgress(), notice: null });
+  });
+});
+
+describe('re-importing a lesson', () => {
+  it('keeps progress for question ids that still exist and drops the rest', () => {
+    const p = emptyProgress();
+    p.questions['l#q1'] = { box: 3, due: '2026-11-05', firstSeen: '2026-11-01', history: [] };
+    p.questions['l#q2'] = { box: 2, due: '2026-11-05', firstSeen: '2026-11-01', history: [] };
+    p.questions['other#q2'] = { box: 2, due: '2026-11-05', firstSeen: '2026-11-01', history: [] };
+    p.taskChecks['l#t1'] = '2026-11-01';
+    p.lessons.l = { status: 'read', attempts: [], run: { results: { q1: 'correct', q2: 'wrong' }, finished: false } };
+    const dropped = pruneLessonQuestions(p, 'l', ['q1', 'q3']);
+    expect(dropped.sort()).toEqual(['l#q2', 'l#t1']);
+    expect(Object.keys(p.questions).sort()).toEqual(['l#q1', 'other#q2']);
+    expect(p.lessons.l.run!.results).toEqual({ q1: 'correct' });
   });
 });

@@ -98,6 +98,19 @@ export async function reloadLessons(): Promise<void> {
   if (changed) await saveProgress();
 }
 
+export async function saveLessonFile(id: string, text: string): Promise<void> {
+  await app.store.writeText(`lessons/${id}.lesson.md`, text);
+  await reloadLessons();
+}
+
+export async function readGeneratorPrompt(): Promise<string> {
+  return (await readOrNull('generator-prompt.md')) ?? BUNDLED['generator-prompt.md'];
+}
+
+export async function resetGeneratorPrompt(): Promise<void> {
+  await app.store.writeText('generator-prompt.md', BUNDLED['generator-prompt.md']);
+}
+
 export function levels(): Map<string, Level> {
   return allLevels(allUnits(app.curriculum).map((u) => u.id), [...app.lessons.values()], app.progress);
 }

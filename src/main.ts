@@ -14,7 +14,9 @@ import { openExternal } from './platform';
 import { back, currentHash, currentView, navigate, route, startRouter } from './router';
 import { initHeaderbar, setHeader } from './ui/headerbar';
 import { initSidebar, setActiveNav } from './ui/sidebar';
+import { askView } from './views/ask';
 import { homeView } from './views/home';
+import { importView } from './views/import';
 import { lessonView } from './views/lesson';
 import { mapView } from './views/map';
 import { placeholderView } from './views/placeholder';
@@ -71,8 +73,8 @@ async function boot(): Promise<void> {
   route('/library', placeholderView('Library'));
   route('/map', mapView);
   route('/review', reviewView);
-  route('/ask', placeholderView('Ask'));
-  route('/import', placeholderView('Import'));
+  route('/ask', askView);
+  route('/import', importView);
   route('/glossary', placeholderView('Glossary'));
   route('/settings', placeholderView('Settings'));
 

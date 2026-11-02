@@ -43,3 +43,12 @@ Choices made while building that the handoff did not settle, or where the build 
 - **"Not started"** also covers a unit whose lessons were practised but never scored 70%+. There is no separate level for that.
 - **Mastery hover text** on the Map shows the rule for the current level and for the next one.
 - **Extra progress fields**: `lessons[id].imported` (for "oldest imported first"), `lessons[id].lastOpened` (for "continue the most recent"), and `lessons[id].run` (a practice run in progress). `lastPosition` is `{view, scroll}`.
+
+## Prompt loop (M5)
+- **Copied prompt** = `generator-prompt.md` (the user's copy in the data folder) + the learner context block + a last line `My request: …` (or "next …" when the box is empty). The request also appears inside the context block, as the handoff's format shows.
+- **Map → Ask** pre-fills the request as "Teach me the unit P.signals (Signals)." Home's "No lesson ready" passes the chosen energy.
+- **Clipboard in browser mode** falls back to the old `execCommand('copy')` when the Clipboard API is blocked. The desktop app uses the clipboard plugin.
+- **Import saves the cleaned text** (no chat text, no outer fence, `\n` line endings) as `lessons/<id>.lesson.md`. The paste box is cleared after a successful import.
+- **Drag-and-drop or the file button imports the first file only.**
+- **Errors and warnings are sorted by line.** Issues about the whole lesson (no questions, no Practice heading) show "whole lesson" instead of a line number.
+- **Keep both** rewrites only the frontmatter `id:` line to the first free `<id>-2`, `<id>-3`, …

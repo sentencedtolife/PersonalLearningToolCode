@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeText, parseLesson, stripOuterFence } from '../src/lesson/parse';
+import { nextFreeId, normalizeText, parseLesson, replaceLessonId, stripOuterFence } from '../src/lesson/parse';
 import { loadLesson } from '../src/lesson/validate';
 import { readRepoFile } from './helpers';
 
@@ -124,5 +124,19 @@ describe('text cleanup', () => {
 
   it('leaves text without an outer fence alone', () => {
     expect(stripOuterFence(MINI)).toBe(MINI);
+  });
+});
+
+describe('import helpers', () => {
+  it('replaceLessonId changes only the frontmatter id line', () => {
+    const out = replaceLessonId(MINI, 't-mini-01-2');
+    expect(out.split('\n')[1]).toBe('id: t-mini-01-2');
+    expect(out.match(/^id: /gm)).toHaveLength(3); // the two question ids are untouched
+    expect(loadLesson(out).lesson!.meta.id).toBe('t-mini-01-2');
+  });
+  it('nextFreeId appends -2, -3, …', () => {
+    const taken = new Set(['a', 'a-2']);
+    expect(nextFreeId('a', (x) => taken.has(x))).toBe('a-3');
+    expect(nextFreeId('b', (x) => taken.has(x))).toBe('b-2');
   });
 });

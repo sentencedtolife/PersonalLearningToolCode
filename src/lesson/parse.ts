@@ -49,6 +49,24 @@ export function stripOuterFence(text: string): string {
   return text;
 }
 
+/** Changes the frontmatter `id:` line (used for "Keep both" on import). The text must already be normalised. */
+export function replaceLessonId(text: string, newId: string): string {
+  const lines = text.split('\n');
+  if (lines[0]?.trim() !== '---') return text;
+  for (let i = 1; i < lines.length && lines[i].trim() !== '---'; i++) {
+    if (/^id\s*:/.test(lines[i])) {
+      lines[i] = `id: ${newId}`;
+      return lines.join('\n');
+    }
+  }
+  return text;
+}
+
+/** First free id of the form <id>-2, <id>-3, … */
+export function nextFreeId(id: string, taken: (id: string) => boolean): string {
+  for (let n = 2; ; n++) if (!taken(`${id}-${n}`)) return `${id}-${n}`;
+}
+
 const KEY_LINE = /^([A-Za-z_][\w-]*)\s*:/;
 export const PRACTICE_HEADING = /^##\s+Practice\s*$/i;
 
