@@ -35,3 +35,11 @@ Choices made while building that the handoff did not settle, or where the build 
 - **Glossary terms** are underlined at every use; only the first use of each term is in the Tab order, so Tab doesn't stop on the same word many times.
 - **Web links in lessons** open in the system browser (opener plugin, http/https only). The app window never navigates away.
 - **Lesson HTML** may contain inline HTML, but `<style>`, `<script>`, forms, inputs and iframes are removed by DOMPurify. `$5 and $10` is left as money: the closing `$` of inline math must follow a non-space and not be followed by a digit.
+
+## Progress, review and mastery (M4)
+- **"In progress"** means opened but not yet marked done (status `read`). Next resumes the most recently opened one; Continue and Next reopen the lesson in the mode it was left in (paper or practice).
+- **Backups**: the first save of each day copies the current `progress.json` (the end state of the last day the app was used) to `backups/progress-YYYY-MM-DD.json`; the 14 newest are kept. A damaged `progress.json` is kept as `backups/progress-damaged-YYYY-MM-DD.json` before the newest readable backup is loaded, and Home shows a one-line notice.
+- **Mastery "averaging"** is checked over any run of consecutive qualifying answers (5 for Proficient, 8 for Mastered), in date order. So a level, once reached, stays reached ("levels only go up"), and early mistakes don't block a level forever. Any answer to a question at least 2 (or 7) days after its `firstSeen` counts as a review answer, whether it came from Review or from practising the lesson again.
+- **"Not started"** also covers a unit whose lessons were practised but never scored 70%+. There is no separate level for that.
+- **Mastery hover text** on the Map shows the rule for the current level and for the next one.
+- **Extra progress fields**: `lessons[id].imported` (for "oldest imported first"), `lessons[id].lastOpened` (for "continue the most recent"), and `lessons[id].run` (a practice run in progress). `lastPosition` is `{view, scroll}`.

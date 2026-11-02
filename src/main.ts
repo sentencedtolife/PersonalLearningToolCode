@@ -16,6 +16,7 @@ import { initHeaderbar, setHeader } from './ui/headerbar';
 import { initSidebar, setActiveNav } from './ui/sidebar';
 import { homeView } from './views/home';
 import { lessonView } from './views/lesson';
+import { mapView } from './views/map';
 import { placeholderView } from './views/placeholder';
 import { reviewView } from './views/review';
 
@@ -68,7 +69,7 @@ async function boot(): Promise<void> {
   route('/home', homeView);
   route('/lesson/:id/:mode?', lessonView);
   route('/library', placeholderView('Library'));
-  route('/map', placeholderView('Map'));
+  route('/map', mapView);
   route('/review', reviewView);
   route('/ask', placeholderView('Ask'));
   route('/import', placeholderView('Import'));

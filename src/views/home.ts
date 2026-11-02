@@ -5,6 +5,11 @@ import { navigate, type ViewFactory } from '../router';
 import { button, energyPicker, h } from '../ui/components';
 import { dueCount } from './review';
 
+/** A lesson reopens in the mode it was left in. */
+function lessonRoute(id: string): string {
+  return app.progress.lessons[id]?.lastPosition?.view === 'practice' ? `#/lesson/${id}/practice` : `#/lesson/${id}`;
+}
+
 export const homeView: ViewFactory = () => {
   const el = h('div', { class: 'home' });
   let step: 'start' | 'energy' | 'none' = 'start';
@@ -16,7 +21,7 @@ export const homeView: ViewFactory = () => {
     void saveSettings({ lastEnergy: energy });
     const pick = pickNext(app.lessons, app.progress, energy, levels());
     if (pick.kind === 'none') { step = 'none'; draw(); return; }
-    navigate(`#/lesson/${pick.lessonId}`);
+    navigate(lessonRoute(pick.lessonId));
   };
 
   const inProgress = () => {
@@ -33,7 +38,7 @@ export const homeView: ViewFactory = () => {
         notice ?? '',
         button('Next', () => { step = 'energy'; draw(); }, { variant: 'primary', big: true }),
         h('div', { class: 'home-secondary' },
-          cont ? button(`Continue: ${cont.meta.title}`, () => navigate(`#/lesson/${cont.meta.id}`), { variant: 'flat' }) : null,
+          cont ? button(`Continue: ${cont.meta.title}`, () => navigate(lessonRoute(cont.meta.id)), { variant: 'flat' }) : null,
           due > 0 ? button(`Review (${due} due)`, () => navigate('#/review'), { variant: 'flat' }) : null));
       (el.querySelector('.btn-primary') as HTMLElement).focus();
     } else if (step === 'energy') {

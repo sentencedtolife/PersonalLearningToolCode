@@ -70,7 +70,7 @@ export function energyPicker(selected: number | null, onPick: (n: 1 | 2 | 3) => 
   return h('div', { class: 'energy-picker', role: 'group', 'aria-label': 'Energy' },
     ([1, 2, 3] as const).map((n) => h('button', {
       class: 'energy-btn', type: 'button', 'aria-pressed': String(selected === n), onclick: () => onPick(n),
-    }, h('span', { class: 'energy-num' }, String(n)), h('span', { class: 'energy-desc' }, descs[n]), h('span', { class: 'key' }, String(n)))));
+    }, h('span', { class: 'energy-num' }, String(n)), h('span', { class: 'energy-desc' }, descs[n]))));
 }
 
 export function escapeHtml(s: string): string {
