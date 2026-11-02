@@ -1,10 +1,36 @@
-// Shared app state: the data store and settings. Loaded once at boot.
-import { createStore, type Store } from './store/store';
+// Shared app state, loaded once at boot: store, settings, curriculum, lesson library, progress.
+import { allUnits, parseCurriculum, type Curriculum } from './curriculum';
+import type { Issue, Lesson } from './lesson/types';
+import { loadLesson } from './lesson/validate';
+import { allLevels, type Level } from './progress/mastery';
+import { emptyProgress, lessonProgress, loadProgress, saveProgress as writeProgress, type Progress } from './progress/progress';
 import { applySettings, parseSettings, type Settings } from './settings';
+import { createStore, type Store } from './store/store';
+
+/** Files in content/, keyed by their path inside the data folder (e.g. "lessons/x.lesson.md"). */
+export const BUNDLED: Record<string, string> = Object.fromEntries(
+  Object.entries(import.meta.glob('/content/**/*.{md,json}', { query: '?raw', import: 'default', eager: true }) as Record<string, string>)
+    .map(([k, v]) => [k.replace(/^\/content\//, ''), v]),
+);
+
+/** Order the bundled lessons count as "imported", so Next follows the starting spine. */
+const BUNDLED_ORDER = ['x-next-action-01', 'p-godot-tour-01', 'c-core-loops-01'];
+
+export interface BrokenLesson { file: string; errors: Issue[] }
 
 export const app = {
   store: null as unknown as Store,
   settings: null as unknown as Settings,
+  curriculum: { version: 1, tracks: [] } as Curriculum,
+  lessons: new Map<string, Lesson>(),
+  broken: [] as BrokenLesson[],
+  progress: emptyProgress() as Progress,
+  /** One-line notice for Home (e.g. progress was restored from a backup). */
+  notice: null as string | null,
+  /** Energy picked on Home in this session. */
+  energy: null as 1 | 2 | 3 | null,
+  /** When each lesson was opened in this session (ms), for session minutes. */
+  openedAt: new Map<string, number>(),
 };
 
 async function readOrNull(path: string): Promise<string | null> {
@@ -17,8 +43,71 @@ async function readOrNull(path: string): Promise<string | null> {
 
 export async function loadApp(): Promise<void> {
   app.store = await createStore();
-  app.settings = parseSettings(await readOrNull('settings.json'));
+  const settingsText = await readOrNull('settings.json');
+  app.settings = parseSettings(settingsText);
   applySettings(app.settings);
+
+  // First run: copy bundled content into the data folder. Never overwrite on later runs.
+  const firstRun = settingsText === null;
+  if (firstRun) {
+    for (const [path, text] of Object.entries(BUNDLED)) {
+      if (!(await app.store.exists(path))) await app.store.writeText(path, text);
+    }
+    await saveSettings();
+  }
+
+  try {
+    app.curriculum = parseCurriculum((await readOrNull('curriculum.json')) ?? BUNDLED['curriculum.json']);
+  } catch {
+    app.curriculum = parseCurriculum(BUNDLED['curriculum.json']);
+    app.notice = 'curriculum.json could not be read, so Nordlys is using the built-in curriculum.';
+  }
+
+  const loaded = await loadProgress(app.store);
+  app.progress = loaded.progress;
+  app.notice = loaded.notice ?? app.notice;
+
+  await reloadLessons();
+  if (firstRun) {
+    const base = Date.now();
+    BUNDLED_ORDER.forEach((id, i) => {
+      if (app.lessons.has(id)) lessonProgress(app.progress, id).imported = new Date(base + i).toISOString();
+    });
+    await saveProgress();
+  }
+}
+
+export function knownUnits(): Set<string> {
+  return new Set(allUnits(app.curriculum).map((u) => u.id));
+}
+
+export async function reloadLessons(): Promise<void> {
+  const files = (await app.store.list('lessons')).filter((f) => f.endsWith('.lesson.md'));
+  const units = knownUnits();
+  app.lessons = new Map();
+  app.broken = [];
+  let changed = false;
+  for (const file of files.sort()) {
+    const text = await app.store.readText(`lessons/${file}`).catch(() => '');
+    const r = loadLesson(text, { knownUnits: units });
+    if (!r.lesson) { app.broken.push({ file, errors: r.errors }); continue; }
+    app.lessons.set(r.lesson.meta.id, r.lesson);
+    const lp = lessonProgress(app.progress, r.lesson.meta.id);
+    if (!lp.imported) { lp.imported = new Date().toISOString(); changed = true; }
+  }
+  if (changed) await saveProgress();
+}
+
+export function levels(): Map<string, Level> {
+  return allLevels(allUnits(app.curriculum).map((u) => u.id), [...app.lessons.values()], app.progress);
+}
+
+let saveChain: Promise<void> = Promise.resolve();
+
+/** Saves are queued so two writes never overlap. */
+export function saveProgress(): Promise<void> {
+  saveChain = saveChain.then(() => writeProgress(app.store, app.progress)).catch((err) => console.error('Saving progress failed', err));
+  return saveChain;
 }
 
 export async function saveSettings(patch: Partial<Settings> = {}): Promise<void> {

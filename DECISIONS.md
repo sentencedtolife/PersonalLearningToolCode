@@ -20,3 +20,18 @@ Choices made while building that the handoff did not settle, or where the build 
 - **Track `K` (capstones)**: units K.onebutton, K.arcade, K.puzzle, K.jam, K.story, with tiers 3–4 and no prerequisites. The handoff gives no tiers or prerequisites for them.
 - **Core Loops sample**: the handoff example's "Explore → fight → …" became "Search a dungeon → fight → …", because "explore" is a banned word in the generator prompt and a test checks the bundled lessons for banned words.
 - **Contract tests**: `tests/content.test.ts` checks that `content/generator-prompt.md` matches HANDOFF.md exactly, that the prompt's own example lesson validates cleanly, and that the bundled lessons follow the prompt's sizing and question-mix rules.
+
+## Paper view and question engine (M2, M3)
+- **M2 and M3 share one commit.** The paper's inline "Check yourself" cards are built from the question engine, so the two milestones landed together.
+- **Inline "Check yourself" cards are self-checks only.** They don't write progress. All questions, including the inline ones, are recorded when answered in Practice mode, so nothing is counted twice.
+- **Practice saves after every answer** (Leitner box, history, the run's results). Closing the app mid-practice resumes at the first unanswered question.
+- **The attempt is recorded when the summary appears.** "Mark lesson done" then sets the status to practiced, logs the session (minutes since the lesson was opened, capped at 240) and returns Home. "Practice again" starts a fresh run.
+- **Answering a question that already has a Leitner box** (e.g. practising a lesson a second time) uses the review rule. The first-practice rule applies only to the very first answer.
+- **After the second wrong try** the card shows "Here is the answer" in Frost blue (nord9), plus the explanation. No red anywhere in questions.
+- **`match`** uses one dropdown per left item; the dropdown options are the right column, shuffled. This is fully keyboard-accessible.
+- **`order`** keyboard use: focus an item, press Space to pick it up, ↑/↓ to move it, Space to drop. Mouse: drag, or the ↑/↓ buttons on each item.
+- **"Hint (N left)"** only appears when the question has hints.
+- **Last question's button says "See summary"** instead of "Next question".
+- **Glossary terms** are underlined at every use; only the first use of each term is in the Tab order, so Tab doesn't stop on the same word many times.
+- **Web links in lessons** open in the system browser (opener plugin, http/https only). The app window never navigates away.
+- **Lesson HTML** may contain inline HTML, but `<style>`, `<script>`, forms, inputs and iframes are removed by DOMPurify. `$5 and $10` is left as money: the closing `$` of inline math must follow a non-space and not be followed by a digit.

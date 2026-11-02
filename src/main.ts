@@ -5,15 +5,19 @@ import '@fontsource/jetbrains-mono/latin-400.css';
 import '@fontsource/source-serif-4/latin-400.css';
 import '@fontsource/source-serif-4/latin-400-italic.css';
 import '@fontsource/source-serif-4/latin-600.css';
+import 'katex/dist/katex.min.css';
 import './styles/nord.css';
 import './styles/app.css';
 
-import { app, loadApp, saveSettings } from './app';
+import { app, loadApp, saveProgress, saveSettings } from './app';
+import { openExternal } from './platform';
 import { back, currentHash, currentView, navigate, route, startRouter } from './router';
 import { initHeaderbar, setHeader } from './ui/headerbar';
 import { initSidebar, setActiveNav } from './ui/sidebar';
 import { homeView } from './views/home';
+import { lessonView } from './views/lesson';
 import { placeholderView } from './views/placeholder';
+import { reviewView } from './views/review';
 
 const GO_KEYS: Record<string, string> = { h: '#/home', l: '#/library', m: '#/map', r: '#/review', a: '#/ask', i: '#/import' };
 
@@ -62,19 +66,38 @@ async function boot(): Promise<void> {
   initSidebar(document.getElementById('sidebar')!, app.settings.sidebarCollapsed, (c) => void saveSettings({ sidebarCollapsed: c }));
 
   route('/home', homeView);
+  route('/lesson/:id/:mode?', lessonView);
   route('/library', placeholderView('Library'));
   route('/map', placeholderView('Map'));
-  route('/review', placeholderView('Review'));
+  route('/review', reviewView);
   route('/ask', placeholderView('Ask'));
   route('/import', placeholderView('Import'));
   route('/glossary', placeholderView('Glossary'));
   route('/settings', placeholderView('Settings'));
 
   installKeyboard();
+
+  // Lesson links to websites open in the system browser, never inside the app window.
+  document.addEventListener('click', (e) => {
+    const a = (e.target as HTMLElement).closest('a[href]') as HTMLAnchorElement | null;
+    if (a && /^https?:/i.test(a.getAttribute('href') ?? '')) {
+      e.preventDefault();
+      void openExternal(a.href);
+    }
+  });
+
+  // Reopen exactly where the app was left.
+  if (!location.hash && app.progress.resume.route && app.progress.resume.route !== '#/home') {
+    history.replaceState(null, '', app.progress.resume.route);
+  }
   const content = document.getElementById('content')!;
   startRouter(content, (hash, view) => {
     setHeader(view.title, view.actions ?? [], hash !== '#/home');
     setActiveNav(hash);
+    if (app.progress.resume.route !== hash) {
+      app.progress.resume.route = hash;
+      void saveProgress();
+    }
   });
 }
 

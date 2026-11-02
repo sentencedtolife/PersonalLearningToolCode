@@ -19,6 +19,15 @@ export async function openDataFolder(): Promise<boolean> {
   return true;
 }
 
+export async function openExternal(url: string): Promise<void> {
+  if (isTauri) {
+    const { openUrl } = await import('@tauri-apps/plugin-opener');
+    await openUrl(url);
+  } else {
+    window.open(url, '_blank', 'noopener');
+  }
+}
+
 /** Asks where to save, then writes the file. Returns the chosen path, or null if cancelled. */
 export async function saveFileAs(defaultName: string, text: string): Promise<string | null> {
   if (isTauri) {
