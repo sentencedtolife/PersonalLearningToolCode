@@ -71,3 +71,8 @@ To check in the desktop window (`npm run app` or the installed app):
 - [ ] "Open data folder" opens `%APPDATA%\app.nordlys` in Explorer.
 - [ ] "Export progress backup" shows a save dialog and writes the file.
 - [ ] Copy prompt for Claude → paste into claude.ai works.
+
+## Build (M7)
+- **Release build**: `Nordlys_0.1.0_x64-setup.exe` is 2.61 MiB (target: under 15 MB); `nordlys.exe` is 5 MB. Rust is built with LTO, `opt-level = "s"`, `strip`.
+- **Installer** is per-user (Tauri's NSIS default), so it needs no admin rights. WebView2 is already part of Windows 11.
+- Checked after building: the release exe opens a window titled Nordlys, creates `%APPDATA%\app.nordlys\`, copies the bundled content into it, and writes `progress.json` and the daily backup.
