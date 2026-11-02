@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Nordlys.App/Nordlys.App.csproj" />
+  <Project Path="Nordlys.Core/Nordlys.Core.csproj" />
+  <Project Path="Nordlys.Tests/Nordlys.Tests.csproj" />
+</Solution>

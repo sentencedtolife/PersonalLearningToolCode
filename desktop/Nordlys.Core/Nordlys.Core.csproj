@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Everything that is not UI: lesson format, validation, progress, learning rules. No WPF here. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Nordlys.Core</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="YamlDotNet" Version="18.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Bundled defaults, copied to the data folder on first run. Shared with the generator prompt contract. -->
+    <EmbeddedResource Include="..\..\content\**\*" LogicalName="content/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Nordlys.Tests" />
+  </ItemGroup>
+</Project>

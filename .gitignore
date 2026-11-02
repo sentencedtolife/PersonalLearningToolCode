@@ -4,3 +4,10 @@ src-tauri/target/
 src-tauri/gen/
 *.log
 .DS_Store
+
+# .NET
+desktop/**/bin/
+desktop/**/obj/
+desktop/publish/
+*.user
+.vs/
