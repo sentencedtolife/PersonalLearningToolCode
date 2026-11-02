@@ -1,7 +1,12 @@
-# Checks that the release app reopens where it was closed: moves/resizes its own window with the Win32 API,
+# Checks that the app reopens where it was closed: moves/resizes its own window with the Win32 API,
 # closes it normally (WM_CLOSE, like the close button), relaunches, and reads the window rectangle back.
-# Usage: powershell -ExecutionPolicy Bypass -File scripts/test-window-state.ps1
-param([string]$Exe = "$PSScriptRoot\..\src-tauri\target\release\nordlys.exe")
+# Always uses a throwaway data folder, never the real one.
+# Usage: powershell -ExecutionPolicy Bypass -File scripts/test-window-state.ps1 [-Exe path\to\Nordlys.exe]
+param(
+  [string]$Exe = "$PSScriptRoot\..\desktop\Nordlys.App\bin\Debug\net10.0-windows\Nordlys.exe",
+  [string]$DataDir = (Join-Path $env:TEMP "nordlys-wstest")
+)
+$ExeArgs = @("--data", "`"$DataDir`"")
 
 Add-Type @"
 using System; using System.Runtime.InteropServices;
@@ -16,7 +21,7 @@ public static class W {
 "@
 
 function Start-App {
-  $p = Start-Process -FilePath $Exe -PassThru
+  $p = if ($ExeArgs.Count) { Start-Process -FilePath $Exe -ArgumentList $ExeArgs -PassThru } else { Start-Process -FilePath $Exe -PassThru }
   $sw = [Diagnostics.Stopwatch]::StartNew()
   while ($p.MainWindowHandle -eq 0 -and $sw.ElapsedMilliseconds -lt 15000) { Start-Sleep -Milliseconds 50; $p.Refresh() }
   Start-Sleep -Seconds 2
