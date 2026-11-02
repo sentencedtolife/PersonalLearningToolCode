@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "tracks": [
+    { "code": "C", "name": "Design Thinking", "share": 0.30, "units": [
+      {"id": "C.verbs", "title": "Player verbs", "tiers": [0], "prereqs": []},
+      {"id": "C.loops", "title": "Core loops", "tiers": [0,1], "prereqs": ["C.verbs"]},
+      {"id": "C.mda", "title": "MDA: rules → behaviour → feelings", "tiers": [1], "prereqs": ["C.loops"]},
+      {"id": "C.motivation", "title": "Goals, rewards and curiosity", "tiers": [1], "prereqs": ["C.mda"]},
+      {"id": "C.ideation", "title": "Generating ideas from constraints", "tiers": [1], "prereqs": ["C.loops"]},
+      {"id": "C.paper", "title": "Paper prototyping and playtesting", "tiers": [1,2], "prereqs": ["C.ideation"]},
+      {"id": "C.systems", "title": "Systems and feedback loops", "tiers": [2], "prereqs": ["C.mda"]},
+      {"id": "C.levels", "title": "Level design: teaching without text", "tiers": [2], "prereqs": ["C.paper"]},
+      {"id": "C.feel", "title": "Game feel", "tiers": [2], "prereqs": ["C.loops"]},
+      {"id": "C.balance", "title": "Difficulty and balance", "tiers": [2,3], "prereqs": ["C.systems"]},
+      {"id": "C.docs", "title": "One-page design docs and pillars", "tiers": [2,3], "prereqs": ["C.paper"]},
+      {"id": "C.iterate", "title": "Iterating from playtest results", "tiers": [3], "prereqs": ["C.docs"]}
+    ] },
+    { "code": "X", "name": "Production & Executive Skills", "share": 0.25, "units": [
+      {"id": "X.actions", "title": "Next physical actions", "tiers": [0], "prereqs": []},
+      {"id": "X.timebox", "title": "Time-boxing and energy sizing", "tiers": [0], "prereqs": []},
+      {"id": "X.scope", "title": "Scope and MoSCoW cutting", "tiers": [1], "prereqs": ["X.actions"]},
+      {"id": "X.breakdown", "title": "Task breakdown and estimating", "tiers": [1], "prereqs": ["X.scope"]},
+      {"id": "X.boards", "title": "Kanban boards and limiting work in progress", "tiers": [2], "prereqs": ["X.breakdown"]},
+      {"id": "X.milestones", "title": "Milestones and vertical slices", "tiers": [2], "prereqs": ["X.breakdown"]},
+      {"id": "X.restart", "title": "Restarting after a break", "tiers": [2], "prereqs": ["X.timebox"]},
+      {"id": "X.postmortem", "title": "Post-mortems", "tiers": [2], "prereqs": ["X.milestones"]},
+      {"id": "X.finish", "title": "Finishing and polish", "tiers": [3], "prereqs": ["X.milestones"]},
+      {"id": "X.jams", "title": "Game jams", "tiers": [3], "prereqs": ["X.scope"]},
+      {"id": "X.release", "title": "Releasing on itch.io", "tiers": [4], "prereqs": ["X.finish"]}
+    ] },
+    { "code": "P", "name": "Programming & Game Maths in Godot", "share": 0.20, "units": [
+      {"id": "P.tour", "title": "Godot tour: editor, nodes, scenes", "tiers": [0], "prereqs": []},
+      {"id": "P.vars", "title": "Variables and types", "tiers": [0], "prereqs": ["P.tour"]},
+      {"id": "P.math.coords", "title": "Coordinates and screen space", "tiers": [0], "prereqs": ["P.tour"]},
+      {"id": "P.logic", "title": "Conditions and loops", "tiers": [1], "prereqs": ["P.vars"]},
+      {"id": "P.functions", "title": "Functions", "tiers": [1], "prereqs": ["P.logic"]},
+      {"id": "P.debug", "title": "Debugging: print, breakpoints, reading errors", "tiers": [1], "prereqs": ["P.functions"]},
+      {"id": "P.input", "title": "Input, movement and delta time", "tiers": [1], "prereqs": ["P.functions", "P.math.coords"]},
+      {"id": "P.math.vectors", "title": "Vectors: direction and distance", "tiers": [1], "prereqs": ["P.math.coords"]},
+      {"id": "P.physics", "title": "Collisions and physics bodies", "tiers": [2], "prereqs": ["P.input"]},
+      {"id": "P.signals", "title": "Signals", "tiers": [2], "prereqs": ["P.functions"]},
+      {"id": "P.ui", "title": "UI and menus", "tiers": [2], "prereqs": ["P.signals"]},
+      {"id": "P.math.trig", "title": "Angles, sine and cosine", "tiers": [2], "prereqs": ["P.math.vectors"]},
+      {"id": "P.math.lerp", "title": "Interpolation and easing", "tiers": [2], "prereqs": ["P.math.vectors"]},
+      {"id": "P.math.random", "title": "Randomness and probability", "tiers": [2], "prereqs": ["P.vars"]},
+      {"id": "P.states", "title": "State machines", "tiers": [3], "prereqs": ["P.signals"]},
+      {"id": "P.data", "title": "Resources and save/load", "tiers": [3], "prereqs": ["P.functions"]},
+      {"id": "P.arch", "title": "Scene architecture and reuse", "tiers": [3], "prereqs": ["P.states"]},
+      {"id": "P.export", "title": "Exporting builds", "tiers": [4], "prereqs": ["P.arch"]}
+    ] },
+    { "code": "D", "name": "Game Analysis", "share": 0.10, "units": [
+      {"id": "D.critical", "title": "Critical play basics", "tiers": [0], "prereqs": []},
+      {"id": "D.onboarding", "title": "How games teach the player", "tiers": [1], "prereqs": ["D.critical"]},
+      {"id": "D.genre", "title": "Genre anatomy: comparing loops", "tiers": [2], "prereqs": ["D.onboarding", "C.loops"]},
+      {"id": "D.cases", "title": "Case studies (Super Mario Bros. 1-1, Tetris, Undertale's battles, Celeste's dash and assist mode, Stardew Valley, Portal's test chambers, Papers, Please, Slay the Spire, Into the Breach)", "tiers": [2,3], "prereqs": ["D.critical"]},
+      {"id": "D.reverse", "title": "Reverse design", "tiers": [3], "prereqs": ["D.cases"]}
+    ] },
+    { "code": "A", "name": "Art", "share": 0.05, "units": [
+      {"id": "A.tools", "title": "Pixel art tools (Pixelorama)", "tiers": [0], "prereqs": []},
+      {"id": "A.pixels", "title": "Pixels, palettes and limits", "tiers": [1], "prereqs": ["A.tools"]},
+      {"id": "A.readability", "title": "Silhouette, contrast and readability", "tiers": [1], "prereqs": ["A.pixels"]},
+      {"id": "A.animation", "title": "Frame animation and timing", "tiers": [2], "prereqs": ["A.readability"]},
+      {"id": "A.tiles", "title": "Tilesets", "tiers": [2], "prereqs": ["A.pixels"]},
+      {"id": "A.ui", "title": "UI visuals", "tiers": [2], "prereqs": ["A.readability"]},
+      {"id": "A.style", "title": "Making a cohesive style", "tiers": [3], "prereqs": ["A.animation"]}
+    ] },
+    { "code": "S", "name": "Sound & Music", "share": 0.05, "units": [
+      {"id": "S.sfx", "title": "Sound effects with jsfxr", "tiers": [0], "prereqs": []},
+      {"id": "S.basics", "title": "Music from zero: rhythm, notes, scales", "tiers": [1], "prereqs": []},
+      {"id": "S.chords", "title": "Chords and bass", "tiers": [1], "prereqs": ["S.basics"]},
+      {"id": "S.melody", "title": "Melody and leitmotifs", "tiers": [2], "prereqs": ["S.chords"]},
+      {"id": "S.loops", "title": "Seamless music loops", "tiers": [2], "prereqs": ["S.melody"]},
+      {"id": "S.implement", "title": "Audio in Godot: players and buses", "tiers": [2], "prereqs": ["S.sfx", "P.tour"]},
+      {"id": "S.mix", "title": "Mixing basics", "tiers": [3], "prereqs": ["S.implement"]}
+    ] },
+    { "code": "N", "name": "Narrative", "share": 0.05, "units": [
+      {"id": "N.character", "title": "Characters: want, fear, habit", "tiers": [0,1], "prereqs": []},
+      {"id": "N.dialogue", "title": "Writing dialogue", "tiers": [1], "prereqs": ["N.character"]},
+      {"id": "N.environment", "title": "Environmental storytelling", "tiers": [2], "prereqs": ["N.dialogue"]},
+      {"id": "N.structure", "title": "Story structure (three-act, kishōtenketsu)", "tiers": [2], "prereqs": ["N.character"]},
+      {"id": "N.branching", "title": "Branching choices with mechanical effects", "tiers": [3], "prereqs": ["N.dialogue"]},
+      {"id": "N.ludo", "title": "Ludonarrative harmony: story and mechanics agreeing", "tiers": [3], "prereqs": ["N.branching", "C.mda"]},
+      {"id": "N.world", "title": "Worldbuilding on a budget", "tiers": [3], "prereqs": ["N.environment"]}
+    ] },
+    { "code": "K", "name": "Capstones", "share": 0.00, "units": [
+      {"id": "K.onebutton", "title": "Capstone: one-button game (C + P + X)", "tiers": [3], "prereqs": []},
+      {"id": "K.arcade", "title": "Capstone: score-attack arcade game with juice (P + C + S)", "tiers": [3], "prereqs": []},
+      {"id": "K.puzzle", "title": "Capstone: 10-level puzzle game teaching without text (C.levels + P)", "tiers": [3], "prereqs": []},
+      {"id": "K.jam", "title": "Capstone: full game-jam entry, shipped on itch.io (all tracks)", "tiers": [4], "prereqs": []},
+      {"id": "K.story", "title": "Capstone: short narrative game with own art and music (N + A + S + P)", "tiers": [4], "prereqs": []}
+    ] }
+  ]
+}
