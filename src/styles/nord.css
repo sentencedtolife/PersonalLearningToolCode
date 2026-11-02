@@ -1,0 +1,84 @@
+/* Nord palette: https://www.nordtheme.com */
+:root {
+  --nord0: #2E3440; --nord1: #3B4252; --nord2: #434C5E; --nord3: #4C566A;   /* Polar Night */
+  --nord4: #D8DEE9; --nord5: #E5E9F0; --nord6: #ECEFF4;                    /* Snow Storm */
+  --nord7: #8FBCBB; --nord8: #88C0D0; --nord9: #81A1C1; --nord10: #5E81AC;  /* Frost */
+  --nord11: #BF616A; --nord12: #D08770; --nord13: #EBCB8B; --nord14: #A3BE8C; --nord15: #B48EAD; /* Aurora */
+
+  --track-C: var(--nord8); --track-X: var(--nord13); --track-P: var(--nord10); --track-D: var(--nord15);
+  --track-A: var(--nord12); --track-S: var(--nord14); --track-N: var(--nord7); --track-K: var(--nord9);
+
+  --mastery-0: var(--nord3); --mastery-1: var(--nord9); --mastery-2: var(--nord8); --mastery-3: var(--nord14);
+
+  --correct: var(--nord14);
+  --not-yet: var(--nord13);
+  --error: var(--nord11); /* import validation errors only */
+
+  --radius: 8px;
+  --space: 8px;
+  --font-ui: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Source Serif 4', Georgia, serif;
+  --font-mono: 'JetBrains Mono', Consolas, monospace;
+  --font-paper: var(--font-ui);
+  --font-size: 16px;
+  --anim: 120ms;
+}
+
+/* Dark (default) */
+:root, [data-theme="dark"] {
+  --bg: var(--nord0);
+  --surface: var(--nord1);
+  --surface-2: var(--nord2);
+  --border: var(--nord2);
+  --text: var(--nord6);
+  --text-muted: var(--nord4);
+  --text-faint: #8a93a6;
+  --accent: var(--nord8);
+  --accent-text: var(--nord0);
+  --done-box: var(--nord2);
+  --code-bg: #272c36;
+}
+
+[data-theme="light"] {
+  --bg: var(--nord6);
+  --surface: var(--nord5);
+  --surface-2: var(--nord4);
+  --border: var(--nord4);
+  --text: var(--nord0);
+  --text-muted: var(--nord3);
+  --text-faint: #6b7487;
+  --accent: var(--nord10);
+  --accent-text: var(--nord6);
+  --done-box: var(--nord4);
+  --code-bg: #e2e7ef;
+  /* Yellow and green need more contrast on a light background. */
+  --not-yet: #b88a1e;
+  --correct: #5f8a45;
+}
+
+[data-font-size="S"] { --font-size: 14px; }
+[data-font-size="M"] { --font-size: 16px; }
+[data-font-size="L"] { --font-size: 19px; }
+[data-paper-font="serif"] { --font-paper: var(--font-serif); }
+
+[data-motion="off"] { --anim: 0ms; }
+@media (prefers-reduced-motion: reduce) { :root { --anim: 0ms; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--font-size);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+button, input, textarea, select { font: inherit; color: inherit; }
+a { color: var(--accent); }
+code, pre, kbd { font-family: var(--font-mono); font-size: 0.9em; }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--nord8); outline-offset: 2px; border-radius: 4px; }
+::selection { background: var(--nord3); color: var(--nord6); }
+[data-theme="light"] ::selection { background: var(--nord9); color: var(--nord6); }
