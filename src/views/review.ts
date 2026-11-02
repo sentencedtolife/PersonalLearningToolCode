@@ -6,10 +6,6 @@ import { navigate, type ViewFactory } from '../router';
 import { button, h } from '../ui/components';
 import { questionRunner, type RunItem } from './practice';
 
-export function dueCount(): number {
-  return reviewQueue(app.progress, app.lessons, today(), Infinity).length;
-}
-
 function nextDueDate(): string | null {
   const dates = Object.values(app.progress.questions).map((q) => q.due).sort();
   return dates.find((d) => d > today()) ?? null;

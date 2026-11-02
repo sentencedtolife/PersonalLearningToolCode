@@ -130,9 +130,12 @@ export async function loadProgress(store: Store, date = today()): Promise<{ prog
   return { progress: emptyProgress(), notice: 'progress.json was damaged and no backup could be read, so progress starts empty.' };
 }
 
+/** The date each store last had its daily backup checked, so later saves that day skip the check. */
+const backupChecked = new WeakMap<Store, string>();
+
 export async function saveProgress(store: Store, progress: Progress, date = today()): Promise<void> {
   const backup = `${BACKUP_DIR}/progress-${date}.json`;
-  if (!(await store.exists(backup)) && (await store.exists(FILE))) {
+  if (backupChecked.get(store) !== date && !(await store.exists(backup)) && (await store.exists(FILE))) {
     // First save of the day: keep yesterday's end state.
     const previous = await store.readText(FILE);
     if (parseProgress(previous)) {
@@ -141,5 +144,6 @@ export async function saveProgress(store: Store, progress: Progress, date = toda
       for (const old of all.slice(0, Math.max(0, all.length - KEEP_BACKUPS))) await store.remove(`${BACKUP_DIR}/${old}`);
     }
   }
+  backupChecked.set(store, date);
   await store.writeText(FILE, JSON.stringify(progress, null, 1));
 }

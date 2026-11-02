@@ -14,11 +14,6 @@ const PAPER_TYPE_NAMES: Record<string, string> = {
   concept: 'Concept', 'worked-example': 'Worked example', 'case-study': 'Case study', brief: 'Brief', reference: 'Reference',
 };
 
-/** A lesson reopens in the mode it was left in. */
-export function lessonRoute(id: string): string {
-  return app.progress.lessons[id]?.lastPosition?.view === 'practice' ? `#/lesson/${id}/practice` : `#/lesson/${id}`;
-}
-
 /** Marks the lesson as opened: new -> read, remembers its glossary terms and when it was opened. */
 function openLesson(lesson: Lesson): void {
   const id = lesson.meta.id;
@@ -53,9 +48,26 @@ export function lessonHeader(lesson: Lesson): HTMLElement {
     prereqs.length ? h('p', { class: 'prereq-note' }, `Builds on: ${prereqs.join(', ')}.`, missing.length ? ` (Not in your library yet: ${missing.join(', ')}.)` : '') : null);
 }
 
+/**
+ * Rendered paper HTML (Markdown, KaTeX, glossary terms; question slots still empty), per lesson object.
+ * Re-importing a lesson creates a new object, so its old entry is dropped by the garbage collector.
+ */
+const paperCache = new WeakMap<Lesson, string>();
+
+function paperHtml(lesson: Lesson): string {
+  let html = paperCache.get(lesson);
+  if (html === undefined) {
+    const tmp = h('article', { html: renderPaper(lesson) });
+    applyGlossary(tmp, lesson.meta.glossary);
+    html = tmp.innerHTML;
+    paperCache.set(lesson, html);
+  }
+  return html;
+}
+
 function paperMode(lesson: Lesson): Omit<View, 'title' | 'actions'> {
   const id = lesson.meta.id;
-  const paper = h('article', { class: 'paper', html: renderPaper(lesson) });
+  const paper = h('article', { class: 'paper', html: paperHtml(lesson) });
   const cards: Card[] = [];
   for (const slot of paper.querySelectorAll<HTMLElement>('.q-slot')) {
     const q = lesson.questions.find((x) => x.id === slot.dataset.qid);
@@ -65,7 +77,6 @@ function paperMode(lesson: Lesson): Omit<View, 'title' | 'actions'> {
     slot.replaceWith(card.el);
     cards.push(card);
   }
-  applyGlossary(paper, lesson.meta.glossary);
   const stopHighlight = highlightLazily(paper);
 
   const n = lesson.questions.length;

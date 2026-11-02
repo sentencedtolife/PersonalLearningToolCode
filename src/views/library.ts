@@ -4,7 +4,7 @@ import { unitById } from '../curriculum';
 import type { Lesson } from '../lesson/types';
 import { navigate, type ViewFactory } from '../router';
 import { button, chip, h } from '../ui/components';
-import { lessonRoute } from './lesson';
+import { lessonRoute } from './nav';
 
 type Status = 'new' | 'read' | 'practiced';
 const STATUS_LABEL: Record<Status, string> = { new: 'New', read: 'In progress', practiced: 'Practised' };

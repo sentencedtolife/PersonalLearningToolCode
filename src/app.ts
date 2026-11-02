@@ -87,9 +87,10 @@ export async function reloadLessons(): Promise<void> {
   app.lessons = new Map();
   app.broken = [];
   let changed = false;
-  for (const file of files.sort()) {
-    const text = await app.store.readText(`lessons/${file}`).catch(() => '');
-    const r = loadLesson(text, { knownUnits: units });
+  // Read all files at once: in the desktop app each read is a round trip to the Rust side.
+  const texts = await Promise.all(files.sort().map((f) => app.store.readText(`lessons/${f}`).catch(() => '')));
+  for (const [i, file] of files.entries()) {
+    const r = loadLesson(texts[i], { knownUnits: units });
     if (!r.lesson) { app.broken.push({ file, errors: r.errors }); continue; }
     app.lessons.set(r.lesson.meta.id, r.lesson);
     const lp = lessonProgress(app.progress, r.lesson.meta.id);
@@ -115,12 +116,29 @@ export function levels(): Map<string, Level> {
   return allLevels(allUnits(app.curriculum).map((u) => u.id), [...app.lessons.values()], app.progress);
 }
 
-let saveChain: Promise<void> = Promise.resolve();
+let saving: Promise<void> | null = null;
+let dirty = false;
 
-/** Saves are queued so two writes never overlap. */
+/**
+ * Two writes never overlap, and a burst of calls (e.g. open lesson + record the route) becomes one write.
+ * The returned promise resolves once the latest state is on disk.
+ */
 export function saveProgress(): Promise<void> {
-  saveChain = saveChain.then(() => writeProgress(app.store, app.progress)).catch((err) => console.error('Saving progress failed', err));
-  return saveChain;
+  dirty = true;
+  saving ??= (async () => {
+    try {
+      while (dirty) {
+        await Promise.resolve(); // let calls made in the same tick join this write
+        dirty = false;
+        await writeProgress(app.store, app.progress);
+      }
+    } catch (err) {
+      console.error('Saving progress failed', err);
+    } finally {
+      saving = null;
+    }
+  })();
+  return saving;
 }
 
 export async function saveSettings(patch: Partial<Settings> = {}): Promise<void> {

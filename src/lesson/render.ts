@@ -7,6 +7,7 @@ import json from 'highlight.js/lib/languages/json';
 import plaintext from 'highlight.js/lib/languages/plaintext';
 import python from 'highlight.js/lib/languages/python';
 import katex from 'katex';
+import 'katex/dist/katex.min.css';
 import MarkdownIt from 'markdown-it';
 import type { StateBlock, StateInline } from 'markdown-it';
 import { escapeHtml } from '../ui/components';

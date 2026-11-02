@@ -3,8 +3,7 @@ import { app, levels, saveSettings } from '../app';
 import { pickNext } from '../progress/next';
 import { navigate, type ViewFactory } from '../router';
 import { button, energyPicker, h } from '../ui/components';
-import { lessonRoute } from './lesson';
-import { dueCount } from './review';
+import { dueCount, lessonRoute } from './nav';
 
 export const homeView: ViewFactory = () => {
   const el = h('div', { class: 'home' });

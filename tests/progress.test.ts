@@ -229,8 +229,11 @@ describe('progress.json storage', () => {
     expect(await store.list('backups')).toEqual([]); // nothing to back up yet
     p.sessions.push({ date: '2026-11-01', energy: 1, lessonId: 'x', minutes: 5 });
     await saveProgress(store, p, '2026-11-01');
-    expect(await store.list('backups')).toEqual(['progress-2026-11-01.json']);
-    for (let d = 2; d <= 20; d++) await saveProgress(store, p, `2026-11-${String(d).padStart(2, '0')}`);
+    expect(await store.list('backups')).toEqual([]); // day 1 had no earlier state to keep
+    await saveProgress(store, p, '2026-11-02');
+    expect(await store.list('backups')).toEqual(['progress-2026-11-02.json']);
+    expect(JSON.parse(await store.readText('backups/progress-2026-11-02.json')).sessions).toHaveLength(1);
+    for (let d = 3; d <= 20; d++) await saveProgress(store, p, `2026-11-${String(d).padStart(2, '0')}`);
     const backups = await store.list('backups');
     expect(backups).toHaveLength(14);
     expect(backups[0]).toBe('progress-2026-11-07.json');

@@ -1,4 +1,5 @@
 // Tiny hash router: #/home, #/lesson/<id>, #/lesson/<id>/practice, #/ask?unit=C.loops ...
+import { recordRoute } from './perf';
 
 export interface View {
   title: string;
@@ -23,6 +24,12 @@ const stack: string[] = [];
 
 export function route(pattern: string, factory: ViewFactory): void {
   routes.push({ parts: pattern.split('/').filter(Boolean), factory });
+}
+
+/** A route whose view module is imported the first time it is opened. */
+export function lazy(load: () => Promise<ViewFactory>): ViewFactory {
+  let factory: ViewFactory | null = null;
+  return async (params, query) => (factory ??= await load())(params, query);
 }
 
 export function currentView(): View | null {
@@ -75,6 +82,7 @@ async function rerender(): Promise<void> {
   if (stack.length > 1 && stack[stack.length - 2] === hash) stack.pop();
   else if (stack[stack.length - 1] !== hash) stack.push(hash);
 
+  const started = performance.now();
   const token = ++renderToken;
   const m = match(hash) ?? match('#/home')!;
   let view: View;
@@ -94,6 +102,7 @@ async function rerender(): Promise<void> {
   container.scrollTop = 0;
   onRenderedCb(hash, view);
   view.mounted?.();
+  recordRoute(hash, performance.now() - started);
 }
 
 export function startRouter(el: HTMLElement, onRendered: (hash: string, view: View) => void): void {

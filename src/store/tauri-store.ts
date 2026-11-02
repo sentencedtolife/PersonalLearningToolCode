@@ -10,13 +10,19 @@ function parentOf(path: string): string {
 
 /** Files live in the OS app-data folder, e.g. %APPDATA%\app.nordlys on Windows. */
 export class TauriStore implements Store {
+  /** Folders known to exist, so writes skip the check. */
+  private dirs = new Set<string>();
+
   readText(path: string): Promise<string> {
     return readTextFile(path, base);
   }
 
   async writeText(path: string, text: string): Promise<void> {
     const dir = parentOf(path);
-    if (!(await exists(dir, base))) await mkdir(dir, { ...base, recursive: true });
+    if (!this.dirs.has(dir)) {
+      if (!(await exists(dir, base))) await mkdir(dir, { ...base, recursive: true });
+      this.dirs.add(dir);
+    }
     const tmp = `${path}.tmp`;
     await writeTextFile(tmp, text, base);
     await rename(tmp, path, { oldPathBaseDir: BaseDirectory.AppData, newPathBaseDir: BaseDirectory.AppData });

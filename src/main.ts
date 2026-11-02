@@ -5,23 +5,21 @@ import '@fontsource/jetbrains-mono/latin-400.css';
 import '@fontsource/source-serif-4/latin-400.css';
 import '@fontsource/source-serif-4/latin-400-italic.css';
 import '@fontsource/source-serif-4/latin-600.css';
-import 'katex/dist/katex.min.css';
 import './styles/nord.css';
 import './styles/app.css';
 
 import { app, loadApp, saveProgress, saveSettings } from './app';
+import { markBoot } from './perf';
 import { openExternal } from './platform';
-import { back, currentHash, currentView, navigate, route, startRouter } from './router';
+import { back, currentHash, currentView, lazy, navigate, route, startRouter } from './router';
 import { initHeaderbar, setHeader } from './ui/headerbar';
 import { initSidebar, setActiveNav } from './ui/sidebar';
 import { askView } from './views/ask';
 import { glossaryView } from './views/glossary';
 import { homeView } from './views/home';
 import { importView } from './views/import';
-import { lessonView } from './views/lesson';
 import { libraryView } from './views/library';
 import { mapView } from './views/map';
-import { reviewView } from './views/review';
 import { settingsView } from './views/settings';
 
 const GO_KEYS: Record<string, string> = { h: '#/home', l: '#/library', m: '#/map', r: '#/review', a: '#/ask', i: '#/import' };
@@ -66,15 +64,20 @@ function installKeyboard(): void {
 }
 
 async function boot(): Promise<void> {
+  markBoot('scriptStart');
   await loadApp();
+  markBoot('dataLoaded');
   await initHeaderbar(document.getElementById('headerbar')!, back);
   initSidebar(document.getElementById('sidebar')!, app.settings.sidebarCollapsed, (c) => void saveSettings({ sidebarCollapsed: c }));
 
   route('/home', homeView);
-  route('/lesson/:id/:mode?', lessonView);
+  // Lesson and Review need the Markdown/KaTeX/highlight.js stack, so they load on first use.
+  const loadLesson = () => import('./views/lesson');
+  const loadReview = () => import('./views/review');
+  route('/lesson/:id/:mode?', lazy(() => loadLesson().then((m) => m.lessonView)));
   route('/library', libraryView);
   route('/map', mapView);
-  route('/review', reviewView);
+  route('/review', lazy(() => loadReview().then((m) => m.reviewView)));
   route('/ask', askView);
   route('/import', importView);
   route('/glossary', glossaryView);
@@ -96,7 +99,15 @@ async function boot(): Promise<void> {
     history.replaceState(null, '', app.progress.resume.route);
   }
   const content = document.getElementById('content')!;
+  let first = true;
   startRouter(content, (hash, view) => {
+    if (first) {
+      first = false;
+      markBoot('firstView');
+      // Warm the lesson screens while the user is reading Home, so the first lesson opens instantly.
+      const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1500));
+      idle(() => { void loadLesson(); void loadReview(); });
+    }
     setHeader(view.title, view.actions ?? [], hash !== '#/home');
     setActiveNav(hash);
     if (app.progress.resume.route !== hash) {
