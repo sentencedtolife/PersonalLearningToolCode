@@ -2,14 +2,14 @@
 
 A small offline Windows app that teaches game development with **papers** (lecture-style readings) and **practice questions** (one per screen, with hints, explanations, review scheduling and mastery levels).
 
-The app does not write lessons. You ask Claude for a lesson in a normal claude.ai chat, copy what it gives you, and import it. No account, no API key, no internet connection needed by the app.
+The app does not write lessons. You ask Claude for a lesson in a normal claude.ai chat, copy what it gives you, and import it. No account, no API key. The only time it goes online is to check GitHub for a new version (you can turn that off).
 
 ## Install
 
-1. Run `desktop\publish\Nordlys-0.2.1-setup.exe` (after building, see below). It needs no admin rights.
+1. Download `Nordlys-<version>-setup.exe` from the [latest release](https://github.com/sentencedtolife/PersonalLearningToolCode/releases/latest) and run it. It needs no admin rights.
 2. Open **Nordlys** from the Start menu.
 
-If the earlier version (0.1.0) is installed, this replaces it in place. Your lessons and progress are kept: they live in a separate folder that the installer and uninstaller never touch.
+You only do this once: from 0.3.0 on, Nordlys updates itself (see Updates below). If an earlier version is installed, the installer replaces it in place. Your lessons and progress are kept: they live in a separate folder that the installer and uninstaller never touch.
 
 The first time it opens, it copies three sample lessons, the curriculum and the generator prompt into its data folder.
 
@@ -61,6 +61,9 @@ Right-click (or press the Menu key / Shift+F10) on anything for what you can do 
 - **Marquee resize**: drag the small grip in the bottom-right corner. A translucent blue rectangle shows the new size (the number is in its corner); let go to apply, Esc to cancel. Settings → Resize preview changes how see-through it is.
 - The window reopens at the same size, position and maximised state.
 
+### Updates
+Once a day when it opens, Nordlys asks GitHub whether there is a newer version. If there is, Home shows **Update**. It downloads in the background, then **Restart to update** swaps in the new version and reopens the app. Settings → Updates has **Check for updates** and the switch that turns the daily check off. Updates never touch your lessons or progress, and if anything goes wrong the old version is put back.
+
 ### Where your data is
 `%APPDATA%\app.nordlys\` (Settings → **Open data folder**):
 - `lessons/` one `.lesson.md` file per lesson
@@ -77,6 +80,8 @@ dotnet run --project Nordlys.App
 dotnet publish Nordlys.App -c Release -r win-x64 --self-contained true -p:PublishReadyToRun=true -o publish\folder
 ```
 
-Then build the installer with NSIS: `makensis /DVERSION=0.2.1 installer\nordlys.nsi`.
+Then build the installer with NSIS: `makensis /DVERSION=0.3.0 installer\nordlys.nsi`.
+
+To release an update, raise `<Version>` in `desktop/Directory.Build.props` and push to main. The GitHub Actions workflow builds and publishes the release.
 
 See `CLAUDE.md` for how the code is organised and `DECISIONS.md` for choices made while building.

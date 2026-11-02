@@ -160,10 +160,11 @@ public sealed class MainWindow : Window
         ThemeManager.Changed += () => { if (hwnd != 0) Native.UseDarkMode(hwnd, ThemeManager.Dark); };
         Loaded += (_, _) =>
         {
-            // Reopen exactly where the app was left.
+            // Reopen exactly where the app was left, unless there is a notice to read (they show on Home).
             var resume = app.Progress.Resume.Route;
-            Nav.Navigate(string.IsNullOrEmpty(resume) ? "#/home" : resume);
+            Nav.Navigate(string.IsNullOrEmpty(resume) || app.Notice != null ? "#/home" : resume);
             App.StartupMs = (DateTime.Now - Process.GetCurrentProcess().StartTime).TotalMilliseconds;
+            UpdateService.CheckOnStartIfDue(app);
         };
     }
 

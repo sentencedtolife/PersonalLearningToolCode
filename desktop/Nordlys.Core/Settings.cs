@@ -19,6 +19,10 @@ public sealed class Settings
     public bool ReduceMotion { get; set; }
     public bool SidebarCollapsed { get; set; }
     public int LastEnergy { get; set; } = 2;
+    /// <summary>Check GitHub for a new version once a day at start. Off = only when asked in Settings.</summary>
+    public bool AutoUpdateCheck { get; set; } = true;
+    /// <summary>When the last update check happened (ISO 8601).</summary>
+    public string? LastUpdateCheck { get; set; }
     /// <summary>Normal (restored) window bounds in device-independent pixels, and whether it was maximised.</summary>
     public WindowBounds? Window { get; set; }
 

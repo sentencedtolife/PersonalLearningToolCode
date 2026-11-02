@@ -30,7 +30,50 @@ public sealed class SettingsView : View
             new MenuEntry("Open data folder", Data.Store.Root != null ? OpenDataFolder : null, Icons.Folder),
             new MenuEntry("Export progress backup…", ExportBackup, Icons.Copy),
         ], outermost: true);
+        UpdateService.Changed += Draw;
         Draw();
+    }
+
+    public override void Closed() => UpdateService.Changed -= Draw;
+
+    /// <summary>Version, update status and the one button that fits the current step.</summary>
+    private FrameworkElement UpdatesRow()
+    {
+        var v = UpdateService.Release?.Version.ToString(3);
+        var status = UpdateService.State switch
+        {
+            UpdateService.Phase.Checking => "Checking GitHub…",
+            UpdateService.Phase.UpToDate => "You have the latest version.",
+            UpdateService.Phase.Available => $"Nordlys {v} is available.",
+            UpdateService.Phase.Downloading => $"Downloading Nordlys {v}… {UpdateService.Progress:P0}",
+            UpdateService.Phase.Ready => $"Nordlys {v} is downloaded. Restart to finish.",
+            UpdateService.Phase.Failed => UpdateService.Error ?? "The update did not work.",
+            _ => UpdateService.IsInstalled ? "Updates come from GitHub." : "Development build: you can check, but updates install only into the installed app.",
+        };
+        Button? action = UpdateService.State switch
+        {
+            UpdateService.Phase.Available => Ui.Btn("Download and install", () => UpdateService.DownloadAsync().Forget(), "BtnPrimary"),
+            UpdateService.Phase.Ready => Ui.Btn("Restart to update", UpdateService.RestartToUpdate, "BtnPrimary"),
+            UpdateService.Phase.Checking or UpdateService.Phase.Downloading => null,
+            _ => Ui.Btn("Check for updates", () => UpdateService.CheckAsync(Data, manual: true).Forget()),
+        };
+        var auto = new CheckBox { Content = "Check automatically (once a day)", IsChecked = Data.Settings.AutoUpdateCheck, Margin = new Thickness(0, 10, 0, 0) };
+        auto.Click += (_, _) => Save(st => st.AutoUpdateCheck = auto.IsChecked == true);
+
+        var left = new StackPanel { Children = { Ui.Text("Updates", "FontBase", "Text", FontWeights.SemiBold), Ui.Muted($"Version {UpdateService.Current.ToString(3)} · {status}", "FontSmall"), auto } };
+        if (UpdateService.Release is { } r && UpdateService.State is UpdateService.Phase.Available or UpdateService.Phase.Downloading or UpdateService.Phase.Ready)
+        {
+            if (r.Notes.Trim() != "") left.Children.Add(Ui.With(Quiz.Rich.Md(r.Notes), n => { n.Margin = new Thickness(0, 8, 0, 0); n.FontSize = 13; }));
+            if (r.PageUrl != "") left.Children.Add(Ui.With(Ui.Btn("Release notes on GitHub", () => Rendering.Markdown.OpenInBrowser(new Uri(r.PageUrl)), "BtnFlat"), b => { b.HorizontalAlignment = HorizontalAlignment.Left; b.Padding = new Thickness(0, 2, 0, 2); b.MinHeight = 0; }));
+        }
+        var g = new Grid();
+        g.ColumnDefinitions.Add(new ColumnDefinition());
+        g.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        left.Margin = new Thickness(0, 0, 16, 0);
+        g.Children.Add(left);
+        if (action != null) { Grid.SetColumn(action, 1); action.VerticalAlignment = VerticalAlignment.Top; g.Children.Add(action); }
+        var b2 = new Border { Child = g, BorderThickness = new Thickness(0, 0, 0, 1) };
+        return b2.Res(Border.BorderBrushProperty, "Border").Res(Border.PaddingProperty, "PadSetting");
     }
 
     private void Save(Action<Settings> change)
@@ -111,6 +154,7 @@ public sealed class SettingsView : View
             Row("Resize preview", "How see-through the blue rectangle is when you drag the corner grip (or press Alt+F8).", Choice(s => s.MarqueeAlpha, (s, v) => s.MarqueeAlpha = v, (0.15, "Light"), (0.25, "Medium"), (0.4, "Strong"))),
             Row("Data folder", "Lessons, progress, backups, curriculum.json and generator-prompt.md.", Ui.Btn("Open data folder", OpenDataFolder)),
             Row("Generator prompt", "Replaces your copy of generator-prompt.md with the one that came with the app.", reset),
+            UpdatesRow(),
             Row("Backup", "Saves a copy of progress.json wherever you choose.", Ui.Btn("Export progress backup…", ExportBackup)),
         }) stack.Children.Add(row);
 

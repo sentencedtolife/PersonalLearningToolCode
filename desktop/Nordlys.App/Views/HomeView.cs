@@ -21,9 +21,15 @@ public sealed class HomeView : View
     public override string Title => "Nordlys";
     public override FrameworkElement Root => root;
 
+    /// <summary>A quiet line at the bottom when an update is available: never competes with Next.</summary>
+    private readonly StackPanel updateBar = new() { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Bottom, Margin = new Thickness(0, 0, 0, 20) };
+
     public HomeView()
     {
         root.Children.Add(panel);
+        root.Children.Add(updateBar);
+        UpdateService.Changed += DrawUpdate;
+        DrawUpdate();
         Menus.Attach(root, _ =>
         [
             new MenuEntry("Next lesson", () => { step = Step.Energy; Draw(); }, Icons.Play, "Enter"),
@@ -34,6 +40,25 @@ public sealed class HomeView : View
             new MenuEntry("Import a lesson", () => Go("#/import"), Icons.Import),
         ], outermost: true);
         Draw();
+    }
+
+    public override void Closed() => UpdateService.Changed -= DrawUpdate;
+
+    private void DrawUpdate()
+    {
+        updateBar.Children.Clear();
+        var v = UpdateService.Release?.Version.ToString(3);
+        void Line(string text, Button? action = null)
+        {
+            updateBar.Children.Add(Ui.With(Ui.Muted(text, "FontSmall"), t => t.VerticalAlignment = VerticalAlignment.Center));
+            if (action != null) { action.Margin = new Thickness(8, 0, 0, 0); action.MinHeight = 0; action.Padding = new Thickness(10, 3, 10, 3); updateBar.Children.Add(action); }
+        }
+        switch (UpdateService.State)
+        {
+            case UpdateService.Phase.Available: Line($"Nordlys {v} is available.", Ui.Btn("Update", () => UpdateService.DownloadAsync().Forget(), "BtnFlat")); break;
+            case UpdateService.Phase.Downloading: Line($"Downloading Nordlys {v}… {UpdateService.Progress:P0}"); break;
+            case UpdateService.Phase.Ready: Line($"Nordlys {v} is ready.", Ui.Btn("Restart to update", UpdateService.RestartToUpdate, "BtnFlat")); break;
+        }
     }
 
     private Nordlys.Core.Lesson.LessonDoc? InProgress() =>

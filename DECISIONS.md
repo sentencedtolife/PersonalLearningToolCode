@@ -116,3 +116,19 @@ A light pass "as if macOS and an Arch Linux rice were combined":
 - **Focus ring**: still 2 px nord8 (HANDOFF 9.5), now rounded to the control with a soft outer glow.
 - **Sidebar**: the open screen gets a 3 px accent bar on its left edge, like a tiling-WM bar's focused-workspace marker.
 - **Disabled**: 45 % opacity. Window caption buttons are unchanged (they behave like Windows' own).
+
+## In-app updates (0.3.0)
+Elliott asked for updates fetched from GitHub, without a new installer each time.
+- **Source**: GitHub Releases on the public repo (no token needed). `.github/workflows/release.yml` makes a release whenever main has a `<Version>` with no release yet, so shipping is "bump and push".
+- **This relaxes "no network calls"** for one thing only: `api.github.com` for the version check and GitHub's download hosts for the zip. Redirects are followed by hand and refused if they leave those hosts. Downloads must match the release's `.sha256` file. The zip is extracted with a path check and must contain `Nordlys.exe`. Automatic checks run once a day, stay silent when offline, and can be switched off in Settings.
+- **Unsigned**: the checksum guards against damaged downloads, not against someone with write access to the repo. Code signing costs money, and isn't worth it for one user.
+- **Applying**: the download is staged in `%LOCALAPPDATA%\Nordlys-update` (beside the install, never inside it). "Restart to update" starts the staged copy with `--apply-update`. That copy:
+  - waits for the app to close
+  - renames the install folder aside
+  - copies the new files in, keeping `uninstall.exe`
+  - starts the app again with `--updated`
+
+  If copying fails, the old folder is moved back and the app starts with `--update-failed`, which shows a notice. The version in Settings → Apps is updated only if that uninstall entry points at this folder. The whole folder is swapped, not file by file, so a half-updated app can't happen.
+- **The notice** after an update opens Home (where notices show), not the resumed screen.
+- **The first install of 0.3.0 is manual**: 0.2.x has no updater.
+- **Checked end to end on throwaway folders**: a published 0.3.0 "install" updated itself to a 0.3.1 build from the Settings screen. It kept `uninstall.exe`, removed the staging folder, reopened on Home with "Nordlys is updated to 0.3.1." and kept the `--data` folder across the restart.

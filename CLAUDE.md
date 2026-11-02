@@ -26,7 +26,7 @@ YAML is resolved like js-yaml's core schema (`Yaml.cs`): plain `5` is a number, 
 6. **Keyboard-first.** Everything doable without the mouse.
 7. **Reduced motion respected.** Animations ≤150 ms; off entirely if Windows' animation effects are off or the setting is on.
 
-Non-goals for v1: accounts, sync, telemetry, any network call, calling an AI API, a database, gamification (XP, badges, streaks), a lesson editor.
+Non-goals for v1: accounts, sync, telemetry, any network call except the update check (GitHub only, see below), calling an AI API, a database, gamification (XP, badges, streaks), a lesson editor.
 
 ## How to run
 
@@ -34,12 +34,16 @@ Needs the .NET 10 SDK (installed). Commands from `desktop/`:
 
 ```bash
 dotnet build                                   # Core, App, Tests
-dotnet test --project Nordlys.Tests            # 158 tests: parser, validator, checks, Leitner, mastery, next, storage
+dotnet test --project Nordlys.Tests            # 168 tests: parser, validator, checks, Leitner, mastery, next, storage, updates
 dotnet run --project Nordlys.App               # the app, on the real data folder
 dotnet run --project Nordlys.App -- --data C:\temp\nordlys-test   # on a throwaway data folder
 dotnet publish Nordlys.App -c Release -r win-x64 --self-contained true -p:PublishReadyToRun=true -o publish\folder
-& "$env:LOCALAPPDATA\tauri\NSIS\makensis.exe" /DVERSION=0.2.1 installer\nordlys.nsi   # -> publish\Nordlys-0.2.1-setup.exe
+& "$env:LOCALAPPDATA\tauri\NSIS\makensis.exe" /DVERSION=0.3.0 installer\nordlys.nsi   # -> publish\Nordlys-0.3.0-setup.exe
 ```
+
+## Releasing an update
+
+Raise `<Version>` in `desktop/Directory.Build.props` and push to main. `.github/workflows/release.yml` tests, builds and publishes GitHub release `v<version>` with `Nordlys-<v>-win-x64.zip`, its `.sha256` and the installer (it does nothing if that release already exists). Installed copies find it (once a day at start, or Settings → Check for updates), download it in the background, verify the SHA-256 and swap the app folder on "Restart to update". Code: `Nordlys.Core/Updates.cs` (check, download, safe extract, `Updater.Apply` with rollback) and `Nordlys.App/Shell/UpdateService.cs` (state, restart flow via `--apply-update`). Only an installed copy (with `uninstall.exe` next to it) updates itself; `dotnet run` builds never do.
 
 `global.json` opts into the Microsoft Testing Platform (needed for `dotnet test` on .NET 10 with xUnit v3).
 
