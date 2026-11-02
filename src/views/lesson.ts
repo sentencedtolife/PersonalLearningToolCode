@@ -14,6 +14,11 @@ const PAPER_TYPE_NAMES: Record<string, string> = {
   concept: 'Concept', 'worked-example': 'Worked example', 'case-study': 'Case study', brief: 'Brief', reference: 'Reference',
 };
 
+/** A lesson reopens in the mode it was left in. */
+export function lessonRoute(id: string): string {
+  return app.progress.lessons[id]?.lastPosition?.view === 'practice' ? `#/lesson/${id}/practice` : `#/lesson/${id}`;
+}
+
 /** Marks the lesson as opened: new -> read, remembers its glossary terms and when it was opened. */
 function openLesson(lesson: Lesson): void {
   const id = lesson.meta.id;

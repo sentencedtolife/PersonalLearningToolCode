@@ -3,12 +3,8 @@ import { app, levels, saveSettings } from '../app';
 import { pickNext } from '../progress/next';
 import { navigate, type ViewFactory } from '../router';
 import { button, energyPicker, h } from '../ui/components';
+import { lessonRoute } from './lesson';
 import { dueCount } from './review';
-
-/** A lesson reopens in the mode it was left in. */
-function lessonRoute(id: string): string {
-  return app.progress.lessons[id]?.lastPosition?.view === 'practice' ? `#/lesson/${id}/practice` : `#/lesson/${id}`;
-}
 
 export const homeView: ViewFactory = () => {
   const el = h('div', { class: 'home' });

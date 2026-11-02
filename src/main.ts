@@ -15,12 +15,14 @@ import { back, currentHash, currentView, navigate, route, startRouter } from './
 import { initHeaderbar, setHeader } from './ui/headerbar';
 import { initSidebar, setActiveNav } from './ui/sidebar';
 import { askView } from './views/ask';
+import { glossaryView } from './views/glossary';
 import { homeView } from './views/home';
 import { importView } from './views/import';
 import { lessonView } from './views/lesson';
+import { libraryView } from './views/library';
 import { mapView } from './views/map';
-import { placeholderView } from './views/placeholder';
 import { reviewView } from './views/review';
+import { settingsView } from './views/settings';
 
 const GO_KEYS: Record<string, string> = { h: '#/home', l: '#/library', m: '#/map', r: '#/review', a: '#/ask', i: '#/import' };
 
@@ -70,13 +72,13 @@ async function boot(): Promise<void> {
 
   route('/home', homeView);
   route('/lesson/:id/:mode?', lessonView);
-  route('/library', placeholderView('Library'));
+  route('/library', libraryView);
   route('/map', mapView);
   route('/review', reviewView);
   route('/ask', askView);
   route('/import', importView);
-  route('/glossary', placeholderView('Glossary'));
-  route('/settings', placeholderView('Settings'));
+  route('/glossary', glossaryView);
+  route('/settings', settingsView);
 
   installKeyboard();
 

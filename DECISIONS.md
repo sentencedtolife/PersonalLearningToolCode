@@ -52,3 +52,22 @@ Choices made while building that the handoff did not settle, or where the build 
 - **Drag-and-drop or the file button imports the first file only.**
 - **Errors and warnings are sorted by line.** Issues about the whole lesson (no questions, no Practice heading) show "whole lesson" instead of a line number.
 - **Keep both** rewrites only the frontmatter `id:` line to the first free `<id>-2`, `<id>-3`, …
+
+## Polish (M6)
+- **Glossary screen** lists the terms from lessons you have opened (that is when a lesson's terms become "known" and enter `known_terms` in the prompt context).
+- **Library filters** (track, status) stay as set while the app is open; they reset on restart. Lesson files that fail validation are not listed; a notice names them.
+- **"Reset generator prompt to default"** asks for a second click ("Yes, reset it") in place, because it overwrites an edited file. No popup.
+- **Light theme** darkens yellow and green slightly (`--not-yet`, `--correct`) so they stay readable on Snow Storm backgrounds.
+
+## Manual checklist
+Checked in the browser version during the build (2026-11-02):
+- [x] Keyboard only: G-chords, Next → 1/2/3, choices 1–6, Enter to check, H for hint, Space + ↑/↓ for order, Ctrl+Enter for reflect and import, Esc for back.
+- [x] Light and dark themes, serif paper font, font sizes, reduce motion.
+- [x] Resume after restart: reopening with no route goes to the last screen; lesson scroll position and a half-finished practice run are restored.
+- [x] Corrupt progress.json → newest valid backup + notice (unit test).
+
+To check in the desktop window (`npm run app` or the installed app):
+- [ ] Window controls: minimise, maximise/restore (icon changes), close (turns red on hover), drag by the header, double-click the header to maximise.
+- [ ] "Open data folder" opens `%APPDATA%\app.nordlys` in Explorer.
+- [ ] "Export progress backup" shows a save dialog and writes the file.
+- [ ] Copy prompt for Claude → paste into claude.ai works.
