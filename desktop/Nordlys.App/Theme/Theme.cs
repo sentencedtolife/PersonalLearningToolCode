@@ -8,7 +8,8 @@ namespace Nordlys.App.Theme;
 
 public static class Nord
 {
-    public static readonly Color N0 = C("#2E3440"), N1 = C("#3B4252"), N2 = C("#434C5E"), N3 = C("#4C566A");
+    // Polar Night, shifted darker and toward steel gray (less blue than Nord's #2E3440…#4C566A).
+    public static readonly Color N0 = C("#262A30"), N1 = C("#30353C"), N2 = C("#3A4048"), N3 = C("#4A515B");
     public static readonly Color N4 = C("#D8DEE9"), N5 = C("#E5E9F0"), N6 = C("#ECEFF4");
     public static readonly Color N7 = C("#8FBCBB"), N8 = C("#88C0D0"), N9 = C("#81A1C1"), N10 = C("#5E81AC");
     public static readonly Color N11 = C("#BF616A"), N12 = C("#D08770"), N13 = C("#EBCB8B"), N14 = C("#A3BE8C"), N15 = C("#B48EAD");
@@ -57,9 +58,9 @@ public static class ThemeManager
             Brush(r, "Border", Nord.N2);
             Brush(r, "Text", Nord.N6);
             Brush(r, "TextMuted", Nord.N4);
-            Brush(r, "TextFaint", Nord.C("#8A93A6"));
+            Brush(r, "TextFaint", Nord.C("#8C949E"));
             Brush(r, "DoneBox", Nord.N2);
-            Brush(r, "CodeBg", Nord.C("#272C36"));
+            Brush(r, "CodeBg", Nord.C("#1F2328"));
             Brush(r, "Scrollbar", Nord.N3);
             Brush(r, "Correct", Nord.N14);
             Brush(r, "NotYet", Nord.N13);
@@ -89,13 +90,13 @@ public static class ThemeManager
         Brush(r, "HlKeyword", Dark ? Nord.N9 : Nord.N10);
         Brush(r, "HlString", Dark ? Nord.N14 : Nord.C("#5F8A45"));
         Brush(r, "HlNumber", Dark ? Nord.N15 : Nord.C("#8C5F86"));
-        Brush(r, "HlComment", Dark ? Nord.C("#8A93A6") : Nord.C("#6B7487"));
+        Brush(r, "HlComment", Dark ? Nord.C("#8C949E") : Nord.C("#6B7487"));
         Brush(r, "HlTitle", Dark ? Nord.N8 : Nord.C("#3B7A8A"));
         Brush(r, "HlMeta", Nord.N12);
         Brush(r, "HlType", Dark ? Nord.N7 : Nord.C("#4C8584"));
         // Button hover / press tints: light over dark surfaces, dark over light ones.
-        Brush(r, "HoverTint", Dark ? Color.FromArgb(0x14, 0xFF, 0xFF, 0xFF) : Color.FromArgb(0x0F, 0x2E, 0x34, 0x40));
-        Brush(r, "PressTint", Dark ? Color.FromArgb(0x24, 0xFF, 0xFF, 0xFF) : Color.FromArgb(0x1C, 0x2E, 0x34, 0x40));
+        Brush(r, "HoverTint", Dark ? Color.FromArgb(0x14, 0xFF, 0xFF, 0xFF) : Color.FromArgb(0x0F, 0x26, 0x2A, 0x30));
+        Brush(r, "PressTint", Dark ? Color.FromArgb(0x24, 0xFF, 0xFF, 0xFF) : Color.FromArgb(0x1C, 0x26, 0x2A, 0x30));
         // Hover fades play unless Reduce motion is on or Windows' animation effects are off.
         if (Application.Current.MainWindow is { } w) UI.Motion.SetEnabled(w, !s.ReduceMotion && SystemParameters.ClientAreaAnimation);
         Brush(r, "Error", Nord.N11);

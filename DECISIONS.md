@@ -132,3 +132,6 @@ Elliott asked for updates fetched from GitHub, without a new installer each time
 - **The notice** after an update opens Home (where notices show), not the resumed screen.
 - **The first install of 0.3.0 is manual**: 0.2.x has no updater.
 - **Checked end to end on throwaway folders**: a published 0.3.0 "install" updated itself to a 0.3.1 build from the Settings screen. It kept `uninstall.exe`, removed the staging folder, reopened on Home with "Nordlys is updated to 0.3.1." and kept the `--data` folder across the restart.
+
+## Steel-gray Polar Night (0.3.1)
+The dark grays (nord0–nord3, the tooltip, code-block background and faint text) are moderately darker and less blue, closer to steel gray: `#262A30`, `#30353C`, `#3A4048`, `#4A515B` instead of Nord's `#2E3440`…`#4C566A`. The accent and Snow Storm colours are unchanged. This is also the first release shipped through the in-app updater.

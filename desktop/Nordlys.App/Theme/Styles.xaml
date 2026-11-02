@@ -483,9 +483,9 @@
 
   <!-- Tooltips (glossary definitions, mastery rules) -->
   <Style TargetType="{x:Type ToolTip}">
-    <Setter Property="Background" Value="#2E3440" />
+    <Setter Property="Background" Value="#262A30" />
     <Setter Property="Foreground" Value="#ECEFF4" />
-    <Setter Property="BorderBrush" Value="#4C566A" />
+    <Setter Property="BorderBrush" Value="#4A515B" />
     <Setter Property="FontFamily" Value="{DynamicResource UiFont}" />
     <Setter Property="FontSize" Value="13" />
     <Setter Property="Padding" Value="10,8" />
