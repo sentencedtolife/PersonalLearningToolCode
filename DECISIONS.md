@@ -59,6 +59,19 @@ Choices made while building that the handoff did not settle, or where the build 
 - **"Reset generator prompt to default"** asks for a second click ("Yes, reset it") in place, because it overwrites an edited file. No popup.
 - **Light theme** darkens yellow and green slightly (`--not-yet`, `--correct`) so they stay readable on Snow Storm backgrounds.
 
+## Performance and window overhaul (after M7)
+Measured before and after with the same methods (details in the commit messages):
+- **Lazy lesson stack.** Startup JS 581 KB → 146 KB (193 → 49 KB gzipped). Home ready in the browser build: 28.6 → 16.8 ms median.
+- **Saves**: coalesced, and the daily-backup and folder checks run once. A steady-state save went from 5 file operations to 1 write (tested by counting store calls).
+- **Paper cache** per lesson object (WeakMap). Opening a lesson: 13.8 → 7.3 ms median.
+- **Window state** via the official `tauri-plugin-window-state` (size, position, monitor, maximised, fullscreen). Decorations and visibility are not restored. Off-screen positions (an unplugged monitor) are not restored; the plugin handles that.
+- **Marquee resize**: a grip in the bottom-right corner, plus Alt+F8 for the keyboard (Alt+F8 is the KDE and Windows "resize window" shortcut). The window's top-left stays put. While dragging, the window grows live so the preview can extend past the old edge, but it only shrinks on release, so the rectangle is always visible. Limits: the 720×520 minimum, and the work area of the window's monitor (computed in physical pixels, so mixed DPI is handled). The grip is hidden when the window is maximised or fullscreen. The preview is Frost blue (nord9), with a Light/Medium/Strong opacity setting.
+- **F11** toggles fullscreen.
+- **Accent colours** from Frost and Aurora only. Red and yellow are excluded because they mean "error" and "not yet". In the light theme, accents are darkened with `color-mix` for contrast; the default stays nord10, as before.
+- **Density** setting (Comfortable / Compact) via spacing tokens.
+- **Screen fade**: 120 ms, opacity + transform only. It respects reduced motion.
+- **Not done**: window translucency (Mica/Acrylic). It needs a transparent window, which on Windows drops the frameless window's shadow and rounded corners, and it adds compositing work for little benefit.
+
 ## Manual checklist
 Checked in the browser version during the build (2026-11-02):
 - [x] Keyboard only: G-chords, Next → 1/2/3, choices 1–6, Enter to check, H for hint, Space + ↑/↓ for order, Ctrl+Enter for reflect and import, Esc for back.
@@ -71,6 +84,9 @@ To check in the desktop window (`npm run app` or the installed app):
 - [ ] "Open data folder" opens `%APPDATA%\app.nordlys` in Explorer.
 - [ ] "Export progress backup" shows a save dialog and writes the file.
 - [ ] Copy prompt for Claude → paste into claude.ai works.
+- [ ] Marquee resize: drag the bottom-right grip bigger and smaller; Esc cancels mid-drag; Alt+F8 + arrows + Enter.
+- [ ] Snap: drag the title bar to a screen edge; Win+←/→.
+- [x] Window memory: size, position and maximised state restored after closing (scripts/test-window-state.ps1).
 
 ## Build (M7)
 - **Release build**: `Nordlys_0.1.0_x64-setup.exe` is 2.61 MiB (target: under 15 MB); `nordlys.exe` is 5 MB. Rust is built with LTO, `opt-level = "s"`, `strip`.

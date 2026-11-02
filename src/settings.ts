@@ -1,6 +1,13 @@
+export const ACCENTS = ['frost', 'teal', 'blue', 'deep', 'green', 'purple', 'orange'] as const;
+export type Accent = (typeof ACCENTS)[number];
+
 export interface Settings {
   version: 1;
   theme: 'dark' | 'light';
+  accent: Accent;
+  density: 'comfortable' | 'compact';
+  /** Fill opacity of the marquee-resize preview. */
+  marqueeAlpha: number;
   paperFont: 'sans' | 'serif';
   fontSize: 'S' | 'M' | 'L';
   /** true = no animations at all. The OS "reduce motion" preference also turns them off. */
@@ -12,6 +19,9 @@ export interface Settings {
 export const DEFAULT_SETTINGS: Settings = {
   version: 1,
   theme: 'dark',
+  accent: 'frost',
+  density: 'comfortable',
+  marqueeAlpha: 0.25,
   paperFont: 'sans',
   fontSize: 'M',
   reduceMotion: false,
@@ -35,4 +45,7 @@ export function applySettings(s: Settings): void {
   d.paperFont = s.paperFont;
   d.fontSize = s.fontSize;
   d.motion = s.reduceMotion ? 'off' : 'on';
+  d.accent = s.accent;
+  d.density = s.density;
+  document.documentElement.style.setProperty('--marquee-alpha', String(s.marqueeAlpha));
 }

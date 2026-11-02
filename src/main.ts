@@ -13,6 +13,8 @@ import { markBoot } from './perf';
 import { openExternal } from './platform';
 import { back, currentHash, currentView, lazy, navigate, route, startRouter } from './router';
 import { initHeaderbar, setHeader } from './ui/headerbar';
+import { initMarquee, startKeyboardResize } from './ui/marquee';
+import { getWindowControls } from './platform';
 import { initSidebar, setActiveNav } from './ui/sidebar';
 import { askView } from './views/ask';
 import { glossaryView } from './views/glossary';
@@ -36,6 +38,14 @@ function installKeyboard(): void {
     if (e.defaultPrevented) return;
     const typing = isTyping(e.target);
     const view = currentView();
+
+    // Window keys work everywhere. F11: fullscreen (desktop app). Alt+F8: resize with the keyboard.
+    if (e.key === 'F11') {
+      e.preventDefault();
+      void getWindowControls().then(async (w) => w && w.setFullscreen(!(await w.isFullscreen())));
+      return;
+    }
+    if (e.altKey && e.key === 'F8') { if (startKeyboardResize()) e.preventDefault(); return; }
 
     // "G then X" chords.
     if (gPending && !typing && !e.ctrlKey && !e.metaKey && !e.altKey) {
@@ -68,6 +78,7 @@ async function boot(): Promise<void> {
   await loadApp();
   markBoot('dataLoaded');
   await initHeaderbar(document.getElementById('headerbar')!, back);
+  void initMarquee();
   initSidebar(document.getElementById('sidebar')!, app.settings.sidebarCollapsed, (c) => void saveSettings({ sidebarCollapsed: c }));
 
   route('/home', homeView);

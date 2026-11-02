@@ -60,17 +60,43 @@ export async function saveFileAs(defaultName: string, text: string): Promise<str
   return defaultName;
 }
 
+export interface WindowGeometry {
+  /** Inner size in logical pixels. */
+  width: number;
+  height: number;
+  /** Window position in physical pixels, and its scale factor. */
+  xPhys: number;
+  yPhys: number;
+  scale: number;
+  /** The work area (screen minus taskbar) of the window's monitor, in physical pixels. */
+  workAreaPhys: { x: number; y: number; w: number; h: number } | null;
+}
+
 export interface WindowControls {
   minimize(): void;
   toggleMaximize(): void;
   close(): void;
   isMaximized(): Promise<boolean>;
   onResized(cb: () => void): void;
+  unmaximize(): Promise<void>;
+  isFullscreen(): Promise<boolean>;
+  setFullscreen(on: boolean): Promise<void>;
+  geometry(): Promise<WindowGeometry>;
+  /** Logical pixels. */
+  setSize(w: number, h: number): Promise<void>;
 }
 
-export async function getWindowControls(): Promise<WindowControls | null> {
+let controls: Promise<WindowControls | null> | null = null;
+
+/** One shared instance; null in the browser version. */
+export function getWindowControls(): Promise<WindowControls | null> {
+  return (controls ??= createWindowControls());
+}
+
+async function createWindowControls(): Promise<WindowControls | null> {
   if (!isTauri) return null;
-  const { getCurrentWindow } = await import('@tauri-apps/api/window');
+  const { getCurrentWindow, currentMonitor } = await import('@tauri-apps/api/window');
+  const { LogicalSize } = await import('@tauri-apps/api/dpi');
   const w = getCurrentWindow();
   return {
     minimize: () => void w.minimize(),
@@ -78,5 +104,21 @@ export async function getWindowControls(): Promise<WindowControls | null> {
     close: () => void w.close(),
     isMaximized: () => w.isMaximized(),
     onResized: (cb) => void w.onResized(cb),
+    unmaximize: () => w.unmaximize(),
+    isFullscreen: () => w.isFullscreen(),
+    setFullscreen: (on) => w.setFullscreen(on),
+    async geometry() {
+      const [size, pos, scale, monitor] = await Promise.all([w.innerSize(), w.outerPosition(), w.scaleFactor(), currentMonitor()]);
+      const wa = monitor?.workArea;
+      return {
+        width: size.width / scale,
+        height: size.height / scale,
+        xPhys: pos.x,
+        yPhys: pos.y,
+        scale,
+        workAreaPhys: wa ? { x: wa.position.x, y: wa.position.y, w: wa.size.width, h: wa.size.height } : null,
+      };
+    },
+    setSize: (width, height) => w.setSize(new LogicalSize(width, height)),
   };
 }

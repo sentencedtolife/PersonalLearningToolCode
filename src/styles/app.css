@@ -7,9 +7,9 @@
   height: 100vh;
 }
 #content { grid-area: content; overflow-y: auto; overflow-x: hidden; }
-.page { max-width: 880px; margin: 0 auto; padding: 32px 24px 80px; }
+.page { max-width: 880px; margin: 0 auto; padding: var(--pad-page-y) var(--pad-page-x) 80px; }
 .page-narrow { max-width: 640px; }
-.stack > * + * { margin-top: calc(var(--space) * 2); }
+.stack > * + * { margin-top: var(--gap); }
 .row { display: flex; gap: var(--space); align-items: center; flex-wrap: wrap; }
 .spacer { flex: 1; }
 .muted { color: var(--text-muted); }
@@ -78,7 +78,7 @@ h2 { font-size: 1.3em; font-weight: 600; }
 [data-sidebar="collapsed"] .nav-label, [data-sidebar="collapsed"] .nav-key { display: none; }
 .nav-item {
   display: flex; align-items: center; gap: 12px;
-  height: 38px; padding: 0 11px; border-radius: var(--radius);
+  height: var(--nav-h); padding: 0 11px; border-radius: var(--radius);
   color: var(--text-muted); text-decoration: none; border: none; background: transparent;
   cursor: pointer; white-space: nowrap; width: 100%; text-align: left;
 }
@@ -91,7 +91,7 @@ h2 { font-size: 1.3em; font-weight: 600; }
 /* ---------- Controls ---------- */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 8px 16px; min-height: 38px;
+  padding: var(--pad-btn-y) var(--pad-btn-x); min-height: var(--h-control);
   border-radius: var(--radius); border: 1px solid var(--border);
   background: var(--surface-2); color: var(--text);
   cursor: pointer; text-decoration: none; font-weight: 500;
@@ -120,7 +120,7 @@ textarea.mono { font-family: var(--font-mono); font-size: 0.85em; }
 label.check { display: inline-flex; gap: 8px; align-items: center; cursor: pointer; }
 input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
 
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--pad-card); }
 .chip {
   display: inline-flex; align-items: center; gap: 4px;
   padding: 1px 8px; border-radius: var(--radius); border: 1px solid var(--border);
@@ -220,14 +220,14 @@ figure.svg-figure svg { max-width: 100%; height: auto; }
 .dot.r-half { background: var(--nord9); border-color: var(--nord9); }
 .dot.r-0 { background: var(--not-yet); border-color: var(--not-yet); }
 .dot.r-task { background: var(--nord7); border-color: var(--nord7); }
-.q-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.q-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--pad-q); }
 .q-meta { font-size: 0.8em; color: var(--text-muted); margin-bottom: 8px; }
 .q-body { line-height: 1.6; }
 .q-body > :first-child { margin-top: 0; }
 .q-input { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
 .choice {
   display: flex; gap: 12px; align-items: flex-start; text-align: left;
-  padding: 10px 12px; border-radius: var(--radius); border: 1px solid var(--border);
+  padding: var(--pad-choice-y) var(--pad-choice-x); border-radius: var(--radius); border: 1px solid var(--border);
   background: var(--bg); cursor: pointer; width: 100%;
 }
 .choice:hover:not(:disabled) { border-color: var(--text-faint); }
@@ -274,7 +274,7 @@ figure.svg-figure svg { max-width: 100%; height: auto; }
 .track-swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
 .lib-item {
   display: block; width: 100%; text-align: left; cursor: pointer;
-  padding: 12px 16px; margin-bottom: 8px; color: var(--text); text-decoration: none;
+  padding: calc(var(--pad-card) * 0.75) var(--pad-card); margin-bottom: 8px; color: var(--text); text-decoration: none;
 }
 .lib-item:hover { border-color: var(--text-faint); }
 .lib-item-title { font-weight: 600; }
@@ -314,6 +314,40 @@ figure.svg-figure svg { max-width: 100%; height: auto; }
 .gloss-item dd { margin: 2px 0 0; color: var(--text-muted); }
 
 /* ---------- Settings ---------- */
-.setting { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.setting { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: var(--pad-setting) 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
 .setting-label { font-weight: 500; }
 .setting-help { font-size: 0.85em; color: var(--text-muted); }
+
+/* ---------- Marquee resize ---------- */
+.resize-grip {
+  position: fixed; right: 2px; bottom: 2px; z-index: 30;
+  width: 16px; height: 16px; padding: 2px;
+  border: none; border-radius: 4px; background: transparent;
+  color: var(--text-faint); cursor: nwse-resize; touch-action: none;
+}
+.resize-grip:hover, .resize-grip:focus-visible { color: var(--accent); background: var(--surface-2); }
+.resize-grip svg { width: 12px; height: 12px; display: block; }
+.marquee-layer { position: fixed; inset: 0; z-index: 40; pointer-events: none; }
+.marquee-rect {
+  position: absolute; left: 0; top: 0;
+  border: 1px solid rgb(var(--marquee-rgb) / 0.95);
+  background: rgb(var(--marquee-rgb) / var(--marquee-alpha));
+}
+.marquee-label {
+  position: absolute; font-family: var(--font-mono); font-size: 12px;
+  padding: 2px 8px; border-radius: 4px; background: var(--nord0); color: var(--nord6);
+  border: 1px solid rgb(var(--marquee-rgb) / 0.95);
+}
+.marquee-active, .marquee-active * { cursor: nwse-resize !important; user-select: none !important; }
+
+/* ---------- Accent swatches ---------- */
+.swatches { display: flex; gap: 6px; flex-wrap: wrap; }
+.swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; }
+.swatch[aria-checked="true"] { border-color: var(--text); box-shadow: inset 0 0 0 2px var(--bg); }
+.swatch[data-swatch="frost"] { background: var(--nord8); }
+.swatch[data-swatch="teal"] { background: var(--nord7); }
+.swatch[data-swatch="blue"] { background: var(--nord9); }
+.swatch[data-swatch="deep"] { background: var(--nord10); }
+.swatch[data-swatch="green"] { background: var(--nord14); }
+.swatch[data-swatch="purple"] { background: var(--nord15); }
+.swatch[data-swatch="orange"] { background: var(--nord12); }

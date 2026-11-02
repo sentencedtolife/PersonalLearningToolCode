@@ -46,7 +46,9 @@ npm run release      # installer: src-tauri/target/release/bundle/nsis/*.exe
 - `src/lesson/` parse → validate → render (Markdown, KaTeX, highlight.js, SVG figures, DOMPurify)
 - `src/quiz/` question engine (`engine.ts`) and one file per question type in `types/` (pure `check` + DOM `render`)
 - `src/progress/` progress.json, Leitner scheduling, mastery levels, learner-context block, next-lesson picker
-- `src/views/` one file per screen · `src/ui/` header bar, sidebar, small components
+- `src/views/` one file per screen · `src/ui/` header bar, sidebar, marquee resize, small components
+- Lesson and Review views are lazy-loaded (they pull in markdown-it, KaTeX, highlight.js, DOMPurify). Keep Home, Library, Map, Ask, Import and Settings free of imports from `views/lesson.ts`, `views/practice.ts`, `views/review.ts`, `lesson/render.ts` and `quiz/`, or the startup bundle grows back. Shared helpers for them live in `views/nav.ts`.
+- Timing: `window.__nordlysPerf` (boot milestones, last 50 route renders). `scripts/measure-desktop.ps1` measures the release exe; `scripts/test-window-state.ps1` checks window memory.
 - `content/` bundled defaults copied to the data folder on first run (curriculum, generator prompt, 3 sample lessons)
 
 ## Where user data lives

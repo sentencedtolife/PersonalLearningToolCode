@@ -40,6 +40,13 @@ You can also drop a `.lesson.md` file onto the Import screen.
 | H | Show a hint |
 | Space, then ↑ / ↓ | Pick up and move an item (order questions) |
 | Ctrl+Enter | Show model answer (reflect questions) · Import · Copy prompt |
+| F11 | Fullscreen on / off |
+| Alt+F8 | Resize the window with the arrow keys (Shift = bigger steps, Enter = apply, Esc = cancel) |
+
+### Window
+- Resize from any edge or corner as usual, snap with Win+arrow keys or by dragging the title bar to a screen edge, double-click the title bar to maximise.
+- **Marquee resize**: drag the small grip in the bottom-right corner. A blue rectangle shows the new size (the number is in the corner); let go to apply, Esc to cancel. Settings → Resize preview changes how see-through it is.
+- The window reopens at the same size, position, monitor and maximised state.
 
 ### Where your data is
 `%APPDATA%\app.nordlys\` (Settings → **Open data folder**):
