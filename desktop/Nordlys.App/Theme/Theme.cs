@@ -93,6 +93,11 @@ public static class ThemeManager
         Brush(r, "HlTitle", Dark ? Nord.N8 : Nord.C("#3B7A8A"));
         Brush(r, "HlMeta", Nord.N12);
         Brush(r, "HlType", Dark ? Nord.N7 : Nord.C("#4C8584"));
+        // Button hover / press tints: light over dark surfaces, dark over light ones.
+        Brush(r, "HoverTint", Dark ? Color.FromArgb(0x14, 0xFF, 0xFF, 0xFF) : Color.FromArgb(0x0F, 0x2E, 0x34, 0x40));
+        Brush(r, "PressTint", Dark ? Color.FromArgb(0x24, 0xFF, 0xFF, 0xFF) : Color.FromArgb(0x1C, 0x2E, 0x34, 0x40));
+        // Hover fades play unless Reduce motion is on or Windows' animation effects are off.
+        if (Application.Current.MainWindow is { } w) UI.Motion.SetEnabled(w, !s.ReduceMotion && SystemParameters.ClientAreaAnimation);
         Brush(r, "Error", Nord.N11);
         Brush(r, "Focus", Nord.N8);
         Brush(r, "CloseHover", Nord.N11);

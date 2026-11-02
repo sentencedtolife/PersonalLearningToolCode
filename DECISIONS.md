@@ -107,3 +107,12 @@ Elliott asked for a native Windows app without an embedded browser, and chose a 
 - **Distribution**: a self-contained folder build with ReadyToRun (no .NET install needed), in an NSIS per-user installer (45 MB). It installs into `%LOCALAPPDATA%\Nordlys` and takes over the Tauri version's uninstall entry, so it upgrades that version in place. The uninstaller removes app files only, never the data folder. The old Tauri uninstaller is not run, because its optional "delete app data" step would delete the progress folder.
 - **Measured** (release builds, 5 runs, medians, `scripts/measure-desktop.ps1`): window shown after 674 ms (Tauri: 160 ms, but its page loaded later in the WebView); private memory 77 MB (Tauri + WebView2: 134 MB); 1 process (Tauri: 7); idle CPU 0 ms per 10 s (Tauri: 31–62). Single-file builds were slower to start (975–1104 ms, they unpack first) and used more memory, so the installer ships a folder.
 - **Not verified with a real mouse** (no desktop-control tools in the build session): marquee dragging, Snap Layouts hover, drag-and-drop of order items and files. Everything else was driven through UI Automation, the Menu key and posted window messages on a throwaway data folder.
+
+## Button interaction (0.2.1)
+A light pass "as if macOS and an Arch Linux rice were combined":
+- **Hover**: a soft tint fades over the control (100 ms in, 150 ms out) instead of a border change. Instant when Reduce motion is on or Windows' animation effects are off (`UI/Motion.cs`, an inherited flag the templates read).
+- **Press**: a stronger tint and the control sinks to 97 % (98.5 % for answer choices, 98 % for sidebar items), instantly, like macOS.
+- **Cursor**: the arrow on buttons (macOS); the pointing hand only on link-style buttons.
+- **Focus ring**: still 2 px nord8 (HANDOFF 9.5), now rounded to the control with a soft outer glow.
+- **Sidebar**: the open screen gets a 3 px accent bar on its left edge, like a tiling-WM bar's focused-workspace marker.
+- **Disabled**: 45 % opacity. Window caption buttons are unchanged (they behave like Windows' own).

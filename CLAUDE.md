@@ -38,7 +38,7 @@ dotnet test --project Nordlys.Tests            # 158 tests: parser, validator, c
 dotnet run --project Nordlys.App               # the app, on the real data folder
 dotnet run --project Nordlys.App -- --data C:\temp\nordlys-test   # on a throwaway data folder
 dotnet publish Nordlys.App -c Release -r win-x64 --self-contained true -p:PublishReadyToRun=true -o publish\folder
-& "$env:LOCALAPPDATA\tauri\NSIS\makensis.exe" /DVERSION=0.2.0 installer\nordlys.nsi   # -> publish\Nordlys-0.2.0-setup.exe
+& "$env:LOCALAPPDATA\tauri\NSIS\makensis.exe" /DVERSION=0.2.1 installer\nordlys.nsi   # -> publish\Nordlys-0.2.1-setup.exe
 ```
 
 `global.json` opts into the Microsoft Testing Platform (needed for `dotnet test` on .NET 10 with xUnit v3).

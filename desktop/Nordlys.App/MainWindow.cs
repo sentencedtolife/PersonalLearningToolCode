@@ -48,6 +48,7 @@ public sealed class MainWindow : Window
         UseLayoutRounding = true;
         this.Res(BackgroundProperty, "Bg").Res(FontFamilyProperty, "UiFont").Res(FontSizeProperty, "FontBase").Res(ForegroundProperty, "Text");
         TextOptions.SetTextFormattingMode(this, TextFormattingMode.Ideal);
+        Motion.SetEnabled(this, !app.Settings.ReduceMotion && SystemParameters.ClientAreaAnimation);
 
         WindowChrome.SetWindowChrome(this, new WindowChrome
         {

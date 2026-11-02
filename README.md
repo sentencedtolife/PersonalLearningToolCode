@@ -6,7 +6,7 @@ The app does not write lessons. You ask Claude for a lesson in a normal claude.a
 
 ## Install
 
-1. Run `desktop\publish\Nordlys-0.2.0-setup.exe` (after building, see below). It needs no admin rights.
+1. Run `desktop\publish\Nordlys-0.2.1-setup.exe` (after building, see below). It needs no admin rights.
 2. Open **Nordlys** from the Start menu.
 
 If the earlier version (0.1.0) is installed, this replaces it in place. Your lessons and progress are kept: they live in a separate folder that the installer and uninstaller never touch.
@@ -77,6 +77,6 @@ dotnet run --project Nordlys.App
 dotnet publish Nordlys.App -c Release -r win-x64 --self-contained true -p:PublishReadyToRun=true -o publish\folder
 ```
 
-Then build the installer with NSIS: `makensis /DVERSION=0.2.0 installer\nordlys.nsi`.
+Then build the installer with NSIS: `makensis /DVERSION=0.2.1 installer\nordlys.nsi`.
 
 See `CLAUDE.md` for how the code is organised and `DECISIONS.md` for choices made while building.
