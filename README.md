@@ -1,14 +1,15 @@
 # Nordlys
 
-A small offline desktop app that teaches game development with **papers** (lecture-style readings) and **practice questions** (one per screen, with hints, explanations, review scheduling and mastery levels).
+A small offline Windows app that teaches game development with **papers** (lecture-style readings) and **practice questions** (one per screen, with hints, explanations, review scheduling and mastery levels).
 
 The app does not write lessons. You ask Claude for a lesson in a normal claude.ai chat, copy what it gives you, and import it. No account, no API key, no internet connection needed by the app.
 
 ## Install
 
-1. Run the installer: `src-tauri/target/release/bundle/nsis/Nordlys_0.1.0_x64-setup.exe` (after building, see below).
-2. Click through the installer. It needs no admin rights.
-3. Open **Nordlys** from the Start menu.
+1. Run `desktop\publish\Nordlys-0.2.0-setup.exe` (after building, see below). It needs no admin rights.
+2. Open **Nordlys** from the Start menu.
+
+If the earlier version (0.1.0) is installed, this replaces it in place. Your lessons and progress are kept: they live in a separate folder that the installer and uninstaller never touch.
 
 The first time it opens, it copies three sample lessons, the curriculum and the generator prompt into its data folder.
 
@@ -28,7 +29,17 @@ The first time it opens, it copies three sample lessons, the curriculum and the 
 3. **Copy the lesson** Claude gives you (the whole reply is fine; chat text around the lesson is removed).
 4. **Import**: paste it and press **Import lesson** (Ctrl+Enter). If there are errors, press **Copy error report**, paste it back to Claude in the same chat, and import the corrected lesson.
 
-You can also drop a `.lesson.md` file onto the Import screen.
+You can also drop a `.lesson.md` file onto the Import screen, or use **Open a .lesson.md file…** (Ctrl+O).
+
+### Right-click menus
+Right-click (or press the Menu key / Shift+F10) on anything for what you can do with it:
+- **Selected text** in a lesson: Copy, Search the web, Look up in the Glossary (if it is a term).
+- **A code block**: Copy code block.
+- **A question**: Copy question, Show hint, Show answer, Copy explanation (once answered).
+- **A lesson in the Library**: Open, Practise, Duplicate, Open file in editor, Show in Explorer, Reset progress…, Delete lesson… (to the Recycle Bin).
+- **A unit on the Map**: open its lessons, Ask Claude for a lesson on this unit, Copy unit id.
+- **A term in the Glossary**: Copy term / definition, Open the lesson it came from.
+- **Any text box**: Undo, Cut, Copy, Paste, Select all (only the ones that can run right now).
 
 ### Keyboard
 | Key | Does |
@@ -40,13 +51,15 @@ You can also drop a `.lesson.md` file onto the Import screen.
 | H | Show a hint |
 | Space, then ↑ / ↓ | Pick up and move an item (order questions) |
 | Ctrl+Enter | Show model answer (reflect questions) · Import · Copy prompt |
+| F5 | Reload the lesson or library from its files |
 | F11 | Fullscreen on / off |
 | Alt+F8 | Resize the window with the arrow keys (Shift = bigger steps, Enter = apply, Esc = cancel) |
+| Alt+Space | The window menu (Restore, Move, Size, Minimise, Maximise, Close) |
 
 ### Window
-- Resize from any edge or corner as usual, snap with Win+arrow keys or by dragging the title bar to a screen edge, double-click the title bar to maximise.
-- **Marquee resize**: drag the small grip in the bottom-right corner. A blue rectangle shows the new size (the number is in the corner); let go to apply, Esc to cancel. Settings → Resize preview changes how see-through it is.
-- The window reopens at the same size, position, monitor and maximised state.
+- It behaves like any Windows app: resize from any edge or corner, snap by dragging the title bar to a screen edge or with Win+arrow keys, hover the maximise button for Snap Layouts (Windows 11), right-click the title bar for the window menu, double-click it to maximise.
+- **Marquee resize**: drag the small grip in the bottom-right corner. A translucent blue rectangle shows the new size (the number is in its corner); let go to apply, Esc to cancel. Settings → Resize preview changes how see-through it is.
+- The window reopens at the same size, position and maximised state.
 
 ### Where your data is
 `%APPDATA%\app.nordlys\` (Settings → **Open data folder**):
@@ -56,14 +69,14 @@ You can also drop a `.lesson.md` file onto the Import screen.
 
 ## Build from source
 
-Needs Node LTS, Rust (rustup) and the Visual Studio C++ build tools.
+Needs the .NET 10 SDK. From the `desktop` folder:
 
 ```bash
-npm install
-npm run dev       # web version in a browser: http://localhost:1420
-npm run app       # desktop window, with live reload
-npm test          # unit tests
-npm run release   # installer in src-tauri/target/release/bundle/nsis/
+dotnet test --project Nordlys.Tests
+dotnet run --project Nordlys.App
+dotnet publish Nordlys.App -c Release -r win-x64 --self-contained true -p:PublishReadyToRun=true -o publish\folder
 ```
+
+Then build the installer with NSIS: `makensis /DVERSION=0.2.0 installer\nordlys.nsi`.
 
 See `CLAUDE.md` for how the code is organised and `DECISIONS.md` for choices made while building.
